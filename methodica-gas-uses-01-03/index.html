@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>وقت التدريب #2 — methodica-gas-uses-01-03</title>
+<link rel="stylesheet" href="css/style.css?v=20261103-s2-description-marks">
+<link rel="stylesheet" href="css/motion.css">
+</head>
+<body>
+<div id="app">
+
+  <!-- Global: Report Problem (Figma 207:3590). Visual only — as parts 01-02. -->
+  <button class="flag-btn" id="flag-btn" type="button" aria-label="هل وجدتم مشكلة؟">
+    <span class="flag-btn__icon" aria-hidden="true"></span>
+    <span class="flag-btn__label" aria-hidden="true">هل وجدتم مشكلة؟</span>
+  </button>
+
+  <!-- Feedback popups — Figma "Popup Feedback" size=Short, as parts 01-02. Outside every
+       .screen (shared popup contract); no close control. -->
+  <div class="scq-popup m-popup hidden" id="s1-popup" onpointerdown="popupPointerDown(event,'s1-popup')" role="status" aria-live="polite">
+    <p class="scq-popup-title"></p>
+    <div class="scq-popup-body"></div>
+  </div>
+  <div class="scq-popup m-popup hidden" id="s2-popup" onpointerdown="popupPointerDown(event,'s2-popup')" role="status" aria-live="polite">
+    <p class="scq-popup-title"></p>
+    <div class="scq-popup-body"></div>
+  </div>
+  <div class="scq-popup m-popup hidden" id="s3-popup" onpointerdown="popupPointerDown(event,'s3-popup')" role="status" aria-live="polite">
+    <p class="scq-popup-title"></p>
+    <div class="scq-popup-body"></div>
+  </div>
+  <div class="scq-popup m-popup hidden" id="s4-popup" onpointerdown="popupPointerDown(event,'s4-popup')" role="status" aria-live="polite">
+    <p class="scq-popup-title"></p>
+    <div class="scq-popup-body"></div>
+  </div>
+  <div class="scq-popup m-popup hidden" id="s6-popup" onpointerdown="popupPointerDown(event,'s6-popup')" role="status" aria-live="polite">
+    <p class="scq-popup-title"></p>
+    <div class="scq-popup-body"></div>
+  </div>
+  <div class="scq-popup m-popup hidden" id="s7-popup" onpointerdown="popupPointerDown(event,'s7-popup')" role="status" aria-live="polite">
+    <p class="scq-popup-title"></p>
+    <div class="scq-popup-body"></div>
+  </div>
+
+  <!-- Hints — Figma "Hint Card" (4946:39533) over the shared backdrop, no title (new lomdot).
+       Texts = the slides' hint boxes, paragraph breaks as authored. -->
+  <div class="scq-hint-overlay m-popup hidden" id="s1-hint-overlay" onclick="s1q.closeHintOnBackdrop(event)">
+    <div class="hint-card" role="dialog" aria-modal="true" aria-label="تلميح" aria-describedby="s1-hint-text">
+      <div class="hint-card__text">
+        <svg class="hint-card__ico" viewBox="0 0 26 22.2883" fill="none" aria-hidden="true"><use href="#ico-bulb"/></svg>
+        <p class="hint-card__body" id="s1-hint-text">تذكّروا التجربة التي ضغطتم فيها على المكبس.<br/>ماذا حدث لحجم الهواء؟</p>
+      </div>
+      <button class="hint-card__close" type="button" onclick="s1q.closeHint()"><span class="nav-label"><span>العودة إلى السؤال</span></span></button>
+    </div>
+  </div>
+  <div class="scq-hint-overlay m-popup hidden" id="s2-hint-overlay" onclick="s2CloseHintOnBackdrop(event)">
+    <div class="hint-card" role="dialog" aria-modal="true" aria-label="تلميح" aria-describedby="s2-hint-text">
+      <div class="hint-card__text">
+        <svg class="hint-card__ico" viewBox="0 0 26 22.2883" fill="none" aria-hidden="true"><use href="#ico-bulb"/></svg>
+        <p class="hint-card__body" id="s2-hint-text">فكّروا في مكعب ثلج، وماء في كأس، وهواء في بالون –<br/>كيف يحافظ كلّ منها على شكله وحجمه؟</p>
+      </div>
+      <button class="hint-card__close" type="button" onclick="s2CloseHint()"><span class="nav-label"><span>العودة إلى السؤال</span></span></button>
+    </div>
+  </div>
+  <div class="scq-hint-overlay m-popup hidden" id="s3-hint-overlay" onclick="s3CloseHintOnBackdrop(event)">
+    <div class="hint-card" role="dialog" aria-modal="true" aria-label="تلميح" aria-describedby="s3-hint-text">
+      <div class="hint-card__text">
+        <svg class="hint-card__ico" viewBox="0 0 26 22.2883" fill="none" aria-hidden="true"><use href="#ico-bulb"/></svg>
+        <p class="hint-card__body" id="s3-hint-text">هل يحافظ الغاز على شكل ثابت، أم يأخذ شكل الوعاء؟</p>
+      </div>
+      <button class="hint-card__close" type="button" onclick="s3CloseHint()"><span class="nav-label"><span>العودة إلى السؤال</span></span></button>
+    </div>
+  </div>
+  <div class="scq-hint-overlay m-popup hidden" id="s4-hint-overlay" onclick="s4q.closeHintOnBackdrop(event)">
+    <div class="hint-card" role="dialog" aria-modal="true" aria-label="تلميح" aria-describedby="s4-hint-text">
+      <div class="hint-card__text">
+        <svg class="hint-card__ico" viewBox="0 0 26 22.2883" fill="none" aria-hidden="true"><use href="#ico-bulb"/></svg>
+        <p class="hint-card__body" id="s4-hint-text">ماذا يحدث لكيس الهواء عندما نضغط عليه؟<br/>وماذا يحدث لكيس مملوء بالماء؟</p>
+      </div>
+      <button class="hint-card__close" type="button" onclick="s4q.closeHint()"><span class="nav-label"><span>العودة إلى السؤال</span></span></button>
+    </div>
+  </div>
+  <div class="scq-hint-overlay m-popup hidden" id="s6-hint-overlay" onclick="s6q.closeHintOnBackdrop(event)">
+    <div class="hint-card" role="dialog" aria-modal="true" aria-label="تلميح" aria-describedby="s6-hint-text">
+      <div class="hint-card__text">
+        <svg class="hint-card__ico" viewBox="0 0 26 22.2883" fill="none" aria-hidden="true"><use href="#ico-bulb"/></svg>
+        <p class="hint-card__body" id="s6-hint-text">انظروا إلى المحورين:<br/>ماذا يحدث لحجم الهواء كلما ارتفع الضغط؟</p>
+      </div>
+      <button class="hint-card__close" type="button" onclick="s6q.closeHint()"><span class="nav-label"><span>العودة إلى السؤال</span></span></button>
+    </div>
+  </div>
+  <div class="scq-hint-overlay m-popup hidden" id="s7-hint-overlay" onclick="s7q.closeHintOnBackdrop(event)">
+    <div class="hint-card" role="dialog" aria-modal="true" aria-label="تلميح" aria-describedby="s7-hint-text">
+      <div class="hint-card__text">
+        <svg class="hint-card__ico" viewBox="0 0 26 22.2883" fill="none" aria-hidden="true"><use href="#ico-bulb"/></svg>
+        <p class="hint-card__body" id="s7-hint-text">فكّروا في ما يجب أن يكون متماثلًا في الاختبارين حتى نتمكّن من المقارنة بينهما بشكل صحيح.</p>
+      </div>
+      <button class="hint-card__close" type="button" onclick="s7q.closeHint()"><span class="nav-label"><span>العودة إلى السؤال</span></span></button>
+    </div>
+  </div>
+
+  <!-- Global: Image Zoom (720-templates _global-components "Image zoom"). -->
+  <div id="img-zoom-modal" class="img-zoom-modal hidden" aria-hidden="true">
+    <div class="img-zoom-modal__backdrop" data-zoom-close="true"></div>
+    <div class="img-zoom-modal__panel" role="dialog" aria-modal="true" aria-label="عرض الصورة مكبّرة">
+      <button class="img-zoom-modal__close" type="button" aria-label="إغلاق الصورة" data-zoom-close="true">
+        <svg class="img-zoom-modal__close-icon" aria-hidden="true" width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M14.651 0.348955C14.4275 0.125519 14.1244 0 13.8084 0C13.4924 0 13.1893 0.125519 12.9658 0.348955L7.5 5.81474L2.03422 0.348955C1.81071 0.125519 1.50762 0 1.19159 0C0.875553 0 0.572458 0.125519 0.348955 0.348955C0.125519 0.572458 0 0.875553 0 1.19159C0 1.50762 0.125519 1.81071 0.348955 2.03422L5.81474 7.5L0.348955 12.9658C0.125519 13.1893 0 13.4924 0 13.8084C0 14.1244 0.125519 14.4275 0.348955 14.651C0.572458 14.8745 0.875553 15 1.19159 15C1.50762 15 1.81071 14.8745 2.03422 14.651L7.5 9.18526L12.9658 14.651C13.1893 14.8745 13.4924 15 13.8084 15C14.1244 15 14.4275 14.8745 14.651 14.651C14.8745 14.4275 15 14.1244 15 13.8084C15 13.4924 14.8745 13.1893 14.651 12.9658L9.18526 7.5L14.651 2.03422C14.8745 1.81071 15 1.50762 15 1.19159C15 0.875553 14.8745 0.572458 14.651 0.348955Z" fill="currentColor"/></svg>
+      </button>
+      <div class="img-zoom-modal__stage" id="img-zoom-modal-stage"></div>
+    </div>
+  </div>
+
+  <!-- Shared icon: the Figma hint bulb (nav button 196:6024), as part 01. -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="ico-bulb" viewBox="0 0 26 22.2883">
+      <path fill="currentColor" d="M17.7926 2.76346C16.3676 1.37911 14.5057 0.687763 12.5489 0.815548C9.07997 1.04163 6.27288 3.9168 6.01798 7.50135C5.85649 9.77363 6.70352 11.9443 8.34376 13.4548C9.23038 14.2723 9.74018 15.465 9.74018 16.7265H11.2284H14.7733H16.2616C16.2616 15.4847 16.7919 14.2707 17.7181 13.3959C19.17 12.0263 20.0012 10.0751 20.0012 8.04361C20.0012 6.01215 19.1953 4.12486 17.791 2.76018L17.7926 2.76346ZM13.0001 5.54525C11.6702 5.54525 10.5856 6.66583 10.5856 8.04525C10.5856 8.46956 10.2516 8.81524 9.84151 8.81524C9.43145 8.81524 9.09739 8.46956 9.09739 8.04525C9.09739 5.8172 10.8485 4.00527 13.0001 4.00527C13.4133 4.00527 13.7474 4.35094 13.7474 4.77526C13.7474 5.19957 13.4133 5.54525 13.0001 5.54525Z"/>
+      <path fill="currentColor" d="M9.73859 19.6245C9.73859 20.3289 9.99824 20.9908 10.478 21.4904L10.4938 21.5068C10.9783 22.0098 11.6242 22.2883 12.3114 22.2883H13.6888C14.3775 22.2883 15.025 22.0114 15.5111 21.5052C15.9956 21.0039 16.2631 20.3355 16.2631 19.6277V17.9895H9.73859V19.6245ZM11.2268 19.5294H14.7717V19.6277C14.7717 19.9243 14.6609 20.2077 14.4566 20.419C14.254 20.6254 13.9753 20.7483 13.6888 20.7483H12.3114C12.028 20.7483 11.7588 20.6336 11.5561 20.4305L11.5451 20.4174C11.3424 20.211 11.2268 19.9226 11.2268 19.6261V19.5311V19.5294Z"/>
+      <path fill="currentColor" d="M25.2558 7.27531H22.607C22.1954 7.27531 21.8629 7.62099 21.8629 8.0453C21.8629 8.46962 22.197 8.81529 22.607 8.81529H25.2558C25.6674 8.81529 25.9999 8.46962 25.9999 8.0453C25.9999 7.62099 25.6659 7.27531 25.2558 7.27531Z"/>
+      <path fill="currentColor" d="M4.1386 8.0453C4.1386 7.61935 3.80453 7.27531 3.39447 7.27531H0.744124C0.332481 7.27531 0 7.62099 0 8.0453C0 8.46962 0.334064 8.81529 0.744124 8.81529H3.39289C3.80453 8.81529 4.13701 8.46962 4.13701 8.0453H4.1386Z"/>
+      <path fill="currentColor" d="M20.8702 3.11398C21.0174 3.11398 21.1663 3.06811 21.2961 2.97472L23.4667 1.40198C23.8039 1.15788 23.8847 0.677863 23.6488 0.328911C23.4129 -0.0200418 22.949 -0.105232 22.6118 0.140509L20.4411 1.71325C20.1039 1.95736 20.0232 2.43737 20.2591 2.78632C20.4031 3.00094 20.6343 3.11562 20.8702 3.11562V3.11398Z"/>
+      <path fill="currentColor" d="M4.70374 13.1172L2.53311 14.69C2.19588 14.9341 2.11514 15.4141 2.35104 15.763C2.49512 15.9777 2.72627 16.0923 2.96217 16.0923C3.10941 16.0923 3.25824 16.0465 3.38806 15.9531L5.55869 14.3803C5.89592 14.1362 5.97667 13.6562 5.74076 13.3073C5.50486 12.9583 5.04097 12.8731 4.70374 13.1189V13.1172Z"/>
+      <path fill="currentColor" d="M23.4668 14.6884L21.2961 13.1157C20.9589 12.8716 20.495 12.9567 20.2591 13.3041C20.0232 13.653 20.1055 14.133 20.4412 14.3771L22.6118 15.9499C22.7416 16.0449 22.8905 16.0891 23.0377 16.0891C23.272 16.0891 23.5032 15.9744 23.6488 15.7598C23.8847 15.4109 23.8024 14.9309 23.4668 14.6868V14.6884Z"/>
+      <path fill="currentColor" d="M5.55868 1.71322L3.38806 0.140473C3.05083 -0.10363 2.58694 -0.0184393 2.35103 0.328875C2.11513 0.677827 2.19746 1.15784 2.53311 1.40194L4.70373 2.97469C4.83356 3.06971 4.98238 3.11394 5.12962 3.11394C5.36394 3.11394 5.5951 2.99926 5.74076 2.78465C5.97666 2.4357 5.89433 1.95568 5.55868 1.71158V1.71322Z"/>
+    </symbol>
+  </svg>
+
+  <!-- ============ S0 (screen 0) — TransitionScreen A — slide 27 ============
+       Presenter note: "מסך הזנקה לפני תרגול בסיסי", "שם המסך בפיגמה: TransitionScreen" (no variant
+       named). Same structure as slide 20 (part 02 S0: lead-in / count headline / bold threshold line),
+       for which variant A was approved (C2-01) -> A (4492:37757), recorded as C3-02.
+       Roles: lead-in = "אין כמו תרגול לחיזוק הלמידה." (Body/B-2), headline = "4 שאלות" (H-4; the
+       slide bolds the whole line), closing line = the authored bold line. Count 4 / threshold 3 =
+       ceil(2N/3) (main.js BASIC.threshold). Continue = the slide's "אפשר להתחיל!". Back = the slide's
+       "חזרה" -> part 02's last screen via the session route stack (hidden when opened directly).
+       Media = the companion clip "s0-yellow-chair.mp4" (received as "yellow_chair.mp4") in place of
+       the S-05 placeholder, this screen only, in the existing A frame. Same treatment as part 02 S0:
+       decorative muted one-shot (plays once, holds the last frame), no controls, aria-hidden; played on entry by s0Enter(), paused on leave
+       by goTo(); reduced motion = the first frame, static (approved local change, Noa 2026-10-25). -->
+  <section class="screen active" data-screen="0" id="s0">
+    <div class="s1-content s1-content--a s1-content--stack">
+      <div class="s1-text" data-reveal="1">
+        <div class="s1-title-group">
+          <p class="s1-subtitle s1-subtitle--lead">لا شيء يضاهي التدريب لتعزيز التعلّم.</p>
+          <h1 class="s1-title">4 أسئلة</h1>
+        </div>
+        <p class="s1-subtitle"><strong>وهناك تلميح منذ البداية! أجيبوا بشكل صحيح عن 3 أسئلة على الأقل للتقدّم.</strong></p>
+      </div>
+      <div class="s1-video-wrap s1-video-wrap--char" data-reveal="2" data-reveal-fade>
+        <div class="s1-video-clip"><video class="s1-char-media" id="s0-video" src="assets/video/s0-yellow-chair.mp4" muted playsinline preload="auto" disablepictureinpicture aria-hidden="true" tabindex="-1"></video></div>
+      </div>
+    </div>
+    <button class="btn-continue" type="button" onclick="advanceScreen()"><span class="nav-label"><span>هيّا نبدأ!</span></span></button>
+    <button class="btn-back" id="s0-back" type="button" hidden onclick="goBack()"><span class="nav-label"><span>رجوع</span></span></button>
+  </section>
+
+  <!-- ============ S1 (screen 1) — SingleChoiceQuestionImage — slide 28 (basic 1/4) ============
+       Presenter note: "SingleChoiceQuestion", "בסיסי – שאלה 1 מתוך 4", "תמונה: צלילה", "רמז מופיע מיד".
+       Options in the slide's visual order; correct = option 1 (the check). The bold question line has
+       no run color on the slide -> default stem. Hint = slide 28's box, visible from the start (note =
+       basic-practice default). Picture = production file "צלילה.png" (= the slide's embed); alt = its
+       Alt Text (PPTX descr); zoom. -->
+  <section class="screen" data-screen="1" id="s1">
+    <nav class="progress-question" aria-label="التنقُّل بين الأسئلة">
+      <div class="progress-question__item" data-question="1"><div class="progress-question__icon"></div><span class="progress-question__label">سؤال 1</span></div>
+      <div class="progress-question__connector" data-connector="1"><div class="progress-question__connector-line"></div></div>
+      <div class="progress-question__item" data-question="2"><div class="progress-question__icon"></div><span class="progress-question__label">سؤال 2</span></div>
+      <div class="progress-question__connector" data-connector="2"><div class="progress-question__connector-line"></div></div>
+      <div class="progress-question__item" data-question="3"><div class="progress-question__icon"></div><span class="progress-question__label">سؤال 3</span></div>
+      <div class="progress-question__connector" data-connector="3"><div class="progress-question__connector-line"></div></div>
+      <div class="progress-question__item" data-question="4"><div class="progress-question__icon"></div><span class="progress-question__label">سؤال 4</span></div>
+    </nav>
+    <div class="scq-question">
+      <div class="scq-main" data-reveal="1">
+        <div class="scq-qtext">
+          <div class="scq-qbody">
+            <p class="scq-qstem" id="s1-stem">هل يمكن تقليل حجم الهواء عن طريق تطبيق ضغط عليه؟</p>
+          </div>
+        </div>
+        <div class="scq-answers" role="radiogroup" aria-labelledby="s1-stem">
+          <button class="scq-opt" type="button" role="radio" aria-checked="false" data-id="a" onclick="s1q.select('a')">
+            <span class="scq-radio" aria-hidden="true"></span><span class="scq-opt-text">نعم. الهواء غاز، والغاز قابل للانضغاط</span><span class="vh vh-verdict"></span>
+          </button>
+          <button class="scq-opt" type="button" role="radio" aria-checked="false" data-id="b" onclick="s1q.select('b')">
+            <span class="scq-radio" aria-hidden="true"></span><span class="scq-opt-text">لا. لا توجد أي مادة قابلة للانضغاط</span><span class="vh vh-verdict"></span>
+          </button>
+          <button class="scq-opt" type="button" role="radio" aria-checked="false" data-id="c" onclick="s1q.select('c')">
+            <span class="scq-radio" aria-hidden="true"></span><span class="scq-opt-text">فقط إذا برّدنا الهواء كثيرًا</span><span class="vh vh-verdict"></span>
+          </button>
+          <button class="scq-opt" type="button" role="radio" aria-checked="false" data-id="d" onclick="s1q.select('d')">
+            <span class="scq-radio" aria-hidden="true"></span><span class="scq-opt-text">لا. إنه يرسُب فقط إلى قاع الوعاء</span><span class="vh vh-verdict"></span>
+          </button>
+        </div>
+      </div>
+      <div class="scq-img" data-reveal="2" data-reveal-fade>
+        <div class="scq-img-inner" data-zoom-wrapper>
+          <img src="assets/img/s1-diving-gear.png" width="407" height="271" alt="أسطوانة غوص معدنية مع منظّم تنفّس وقناع غوص.">
+        </div>
+      </div>
+    </div>
+    <button class="btn-continue" id="s1-check" type="button" disabled onclick="s1q.primary()"><span class="nav-label"><span>هل إجابتي صحيحة؟</span></span></button>
+    <button class="scq-hint" id="s1-hint" type="button" onclick="s1q.openHint()">
+      <svg class="scq-hint-ico" viewBox="0 0 26 22.2883" fill="none" aria-hidden="true"><use href="#ico-bulb"/></svg>
+      <span class="nav-label"><span>هل يمكنني الحصول على تلميح؟</span></span>
+    </button>
+    <button class="btn-back" type="button" onclick="goBack()"><span class="nav-label"><span>رجوع</span></span></button>
+  </section>
+
+  <!-- ============ S2 (screen 2) — line-matching question (LOCAL VARIANT) — slide 29 (basic 2/4) ============
+       Presenter note: "סרגל שאלה, שאלה 2 מתוך 4", "רמז מופיע מיד", pairs מוצק / נוזל / גז with their
+       descriptions. The slide's MemoryGame is replaced by a two-column line match (C3-01 / Q-07 decided,
+       Noa 2026-10-25): states on the right in the note's order, descriptions on the left in a fixed
+       order where no description faces its own state; nothing is judged until "צדקתי?". Instruction =
+       the approved new line (the slide's "הפכו את הקלפים..." and its second line no longer apply).
+       No Figma frame and no 720 template for this question: built from the part's existing card,
+       colour and ✓/✗ vocabulary, pending visual approval. Board right-aligned (x 442-1240) clear of
+       the popup's default box (see style.css). -->
+  <section class="screen" data-screen="2" id="s2">
+    <nav class="progress-question" aria-label="التنقُّل بين الأسئلة">
+      <div class="progress-question__item" data-question="1"><div class="progress-question__icon"></div><span class="progress-question__label">سؤال 1</span></div>
+      <div class="progress-question__connector" data-connector="1"><div class="progress-question__connector-line"></div></div>
+      <div class="progress-question__item" data-question="2"><div class="progress-question__icon"></div><span class="progress-question__label">سؤال 2</span></div>
+      <div class="progress-question__connector" data-connector="2"><div class="progress-question__connector-line"></div></div>
+      <div class="progress-question__item" data-question="3"><div class="progress-question__icon"></div><span class="progress-question__label">سؤال 3</span></div>
+      <div class="progress-question__connector" data-connector="3"><div class="progress-question__connector-line"></div></div>
+      <div class="progress-question__item" data-question="4"><div class="progress-question__icon"></div><span class="progress-question__label">سؤال 4</span></div>
+    </nav>
+    <div class="lmq-main">
+      <p class="lmq-title" id="s2-title" data-reveal="1">ارسموا خطًا بين كل حالة من حالات المادة والوصف المناسب لها.</p>
+      <div class="lmq-board" id="s2-board" role="group" aria-labelledby="s2-title" data-reveal="2" data-reveal-fade>
+        <svg class="lmq-lines" id="s2-lines" aria-hidden="true"></svg>
+      </div>
+      <p class="vh" id="s2-live" aria-live="assertive"></p>
+    </div>
+    <button class="btn-continue" id="s2-check" type="button" disabled onclick="s2Primary()"><span class="nav-label"><span>هل إجابتي صحيحة؟</span></span></button>
+    <button class="scq-hint" id="s2-hint" type="button" onclick="s2OpenHint()">
+      <svg class="scq-hint-ico" viewBox="0 0 26 22.2883" fill="none" aria-hidden="true"><use href="#ico-bulb"/></svg>
+      <span class="nav-label"><span>هل يمكنني الحصول على تلميح؟</span></span>
+    </button>
+    <button class="btn-back" type="button" onclick="goBack()"><span class="nav-label"><span>رجوع</span></span></button>
+  </section>
+
+  <!-- ============ S3 (screen 3) — DragAndDropQuestion, sentence blank + word bank — slide 30 (basic 3/4) ============
+       Presenter note: "TextOnlyDragAndDropQuestion", "רמת חשיבה: זכירה", "סרגל שאלה, שאלה 3 מתוך 4",
+       "רמז מופיע מיד", Alt Text of תמונה 3. LOCAL VARIANT = part 01 S13 (paragraph-blanks of
+       methodica-science-mass-liquid-02-02 S1, one blank, labelled bank). Bank = the slide's order right
+       to left (אין / יש / יכול להיות); "מחסן מילים:" is the slide's own label. Correct = "אין" (the
+       solved blank on the slide). Picture: NO production file in the images folder -> TEMPORARY: the
+       slide's own embed (ppt/media/image32.jpeg, 495 x 330), data-temp-asset C3-04; alt = its Alt Text.
+       The slide draws no bottom bar; the note's hint + its authored box make the hint button. -->
+  <section class="screen" data-screen="3" id="s3">
+    <nav class="progress-question" aria-label="التنقُّل بين الأسئلة">
+      <div class="progress-question__item" data-question="1"><div class="progress-question__icon"></div><span class="progress-question__label">سؤال 1</span></div>
+      <div class="progress-question__connector" data-connector="1"><div class="progress-question__connector-line"></div></div>
+      <div class="progress-question__item" data-question="2"><div class="progress-question__icon"></div><span class="progress-question__label">سؤال 2</span></div>
+      <div class="progress-question__connector" data-connector="2"><div class="progress-question__connector-line"></div></div>
+      <div class="progress-question__item" data-question="3"><div class="progress-question__icon"></div><span class="progress-question__label">سؤال 3</span></div>
+      <div class="progress-question__connector" data-connector="3"><div class="progress-question__connector-line"></div></div>
+      <div class="progress-question__item" data-question="4"><div class="progress-question__icon"></div><span class="progress-question__label">سؤال 4</span></div>
+    </nav>
+    <div class="ddqp-main">
+      <div class="ddqp-text" data-reveal="1" data-reveal-fade>
+        <p class="ddqp-title">أكملوا الكلمة الناقصة من بنك الكلمات:</p>
+        <div class="ddqp-para">
+          <p><span class="ddqp-nobr"><span class="ddqp-zone" id="s3-t1"></span> للغاز</span> شكل ثابت خاص به - فهو يأخذ شكل الوعاء الذي يوجد فيه.</p>
+        </div>
+      </div>
+      <div class="ddqp-bank-wrap" data-reveal="2" data-reveal-fade>
+        <p class="ddqp-bank-label">بنك الكلمات:</p>
+        <div class="ddqp-bank">
+          <div class="ddqp-slot"><button class="ddqp-chip" id="s3-d-none" type="button" aria-pressed="false">لا يوجد</button></div>
+          <div class="ddqp-slot"><button class="ddqp-chip" id="s3-d-has" type="button" aria-pressed="false">يوجد</button></div>
+          <div class="ddqp-slot"><button class="ddqp-chip" id="s3-d-maybe" type="button" aria-pressed="false">يمكن أن يكون</button></div>
+        </div>
+      </div>
+      <p class="vh" id="s3-live" aria-live="polite"></p>
+    </div>
+    <div class="ddqp-imgcol">
+      <div class="scq-img" data-reveal="2" data-reveal-fade>
+        <div class="scq-img-inner" data-zoom-wrapper>
+          <img src="assets/img/s3-glass-jug-TEMP-pptx.jpg" width="495" height="330" alt="جرّة زجاجية شفافة ذات شكل غير منتظم، موضوعة على طاولة خشبية." data-temp-asset="C3-04">
+        </div>
+      </div>
+    </div>
+    <button class="btn-continue" id="s3-check" type="button" disabled onclick="s3Primary()"><span class="nav-label"><span>هل إجابتي صحيحة؟</span></span></button>
+    <button class="scq-hint" id="s3-hint" type="button" onclick="s3OpenHint()">
+      <svg class="scq-hint-ico" viewBox="0 0 26 22.2883" fill="none" aria-hidden="true"><use href="#ico-bulb"/></svg>
+      <span class="nav-label"><span>هل يمكنني الحصول على تلميح؟</span></span>
+    </button>
+    <button class="btn-back" type="button" onclick="goBack()"><span class="nav-label"><span>رجوع</span></span></button>
+  </section>
+
+  <!-- ============ S4 (screen 4) — SingleChoiceQuestionImage — slide 31 (basic 4/4) ============
+       Presenter note: "SingleChoiceQuestion", "רמת חשיבה: הבנה", "סרגל שאלה, שאלה 4 מתוך 4", "תמונה: כד",
+       "רמז מופיע מיד", Alt Text of תמונה 14. Correct = option 4 (the check). The bold question line
+       carries a run-level Subject/500 color (019DE5) -> .scq-qstem--accent. Picture = production file
+       "כד.png" (= the slide's embed); zoom. LAST SCREEN OF THE BASIC BUNDLE: its resolved button is the
+       decision point "end of basic" - score >= 3 -> S5 (standard B), else STOP (main.js). -->
+  <section class="screen" data-screen="4" id="s4">
+    <nav class="progress-question" aria-label="التنقُّل بين الأسئلة">
+      <div class="progress-question__item" data-question="1"><div class="progress-question__icon"></div><span class="progress-question__label">سؤال 1</span></div>
+      <div class="progress-question__connector" data-connector="1"><div class="progress-question__connector-line"></div></div>
+      <div class="progress-question__item" data-question="2"><div class="progress-question__icon"></div><span class="progress-question__label">سؤال 2</span></div>
+      <div class="progress-question__connector" data-connector="2"><div class="progress-question__connector-line"></div></div>
+      <div class="progress-question__item" data-question="3"><div class="progress-question__icon"></div><span class="progress-question__label">سؤال 3</span></div>
+      <div class="progress-question__connector" data-connector="3"><div class="progress-question__connector-line"></div></div>
+      <div class="progress-question__item" data-question="4"><div class="progress-question__icon"></div><span class="progress-question__label">سؤال 4</span></div>
+    </nav>
+    <div class="scq-question">
+      <div class="scq-main" data-reveal="1">
+        <div class="scq-qtext">
+          <div class="scq-qbody">
+            <p>عندما يصل طرد طلبتموه، يكون أحيانًا مبطّنًا بأكياس هواء مغلقة.</p>
+            <p class="scq-qstem scq-qstem--accent" id="s4-stem">أيّ خاصية من خصائص الهواء تفسّر لماذا نبطّن بالهواء تحديدًا وليس بأكياس ماء؟</p>
+          </div>
+        </div>
+        <div class="scq-answers" role="radiogroup" aria-labelledby="s4-stem">
+          <button class="scq-opt" type="button" role="radio" aria-checked="false" data-id="a" onclick="s4q.select('a')">
+            <span class="scq-radio" aria-hidden="true"></span><span class="scq-opt-text">لأن أكياس الهواء أرخص من أي مادة تبطين أخرى</span><span class="vh vh-verdict"></span>
+          </button>
+          <button class="scq-opt" type="button" role="radio" aria-checked="false" data-id="b" onclick="s4q.select('b')">
+            <span class="scq-radio" aria-hidden="true"></span><span class="scq-opt-text">لأن الهواء يحافظ على البضاعة جافة</span><span class="vh vh-verdict"></span>
+          </button>
+          <button class="scq-opt" type="button" role="radio" aria-checked="false" data-id="c" onclick="s4q.select('c')">
+            <span class="scq-radio" aria-hidden="true"></span><span class="scq-opt-text">لأن الهواء يملأ حجم الكيس كله</span><span class="vh vh-verdict"></span>
+          </button>
+          <button class="scq-opt" type="button" role="radio" aria-checked="false" data-id="d" onclick="s4q.select('d')">
+            <span class="scq-radio" aria-hidden="true"></span><span class="scq-opt-text">لأن الهواء ينضغط عند الاصطدام ويمتص الصدمة</span><span class="vh vh-verdict"></span>
+          </button>
+        </div>
+      </div>
+      <div class="scq-img" data-reveal="2" data-reveal-fade>
+        <div class="scq-img-inner" data-zoom-wrapper>
+          <img src="assets/img/s4-package-air-bags.png" width="457" height="262" alt="أيدٍ تضع جرة خزفية في صندوق تغليف كرتوني مملوء بأكياس هواء شفافة.">
+        </div>
+      </div>
+    </div>
+    <button class="btn-continue" id="s4-check" type="button" disabled onclick="s4q.primary()"><span class="nav-label"><span>هل إجابتي صحيحة؟</span></span></button>
+    <button class="scq-hint" id="s4-hint" type="button" onclick="s4q.openHint()">
+      <svg class="scq-hint-ico" viewBox="0 0 26 22.2883" fill="none" aria-hidden="true"><use href="#ico-bulb"/></svg>
+      <span class="nav-label"><span>هل يمكنني الحصول على تلميح؟</span></span>
+    </button>
+    <button class="btn-back" type="button" onclick="goBack()"><span class="nav-label"><span>رجوع</span></span></button>
+  </section>
+
+  <!-- ============ S5 (screen 5) — TransitionScreen C (LongText) — slide 32 ============
+       Presenter note: "שם המסך בפיגמה: SectionIntroScreen-LongText" = an explicit reference -> variant C
+       (4924:25836). Lead-in = "יופי של עבודה!" (Body/B-1), headline = the bold "הנה עוד 2 תרגילים ברמת
+       קושי גבוהה" (56 Bold, two lines), no closing line. The slide's speech bubble ships (authored):
+       "ברור לי שתצליחו!" / "ואם לא, אז הרווחתם למידה." on the Figma "bubble text" shape. Continue = the
+       slide's "המשך"; Back = "חזרה" -> S4. Reached only by a learner who passed the basic bundle.
+       Media = the companion clip "s5-yellow-rope.mp4" (received as "yellow_rope.mp4") in place of the
+       S-05 placeholder, this screen only, in the existing C frame. Same treatment as S0: decorative
+       muted one-shot (plays once, holds the last frame), no controls, aria-hidden; played on entry by s5Enter(), paused on leave by goTo();
+       reduced motion = the first frame, static (approved local change, Noa 2026-10-25). -->
+  <section class="screen" data-screen="5" id="s5">
+    <div class="s1-content s1-content--c">
+      <div class="s1-text" data-reveal="1">
+        <p class="s1-subtitle s1-subtitle--framed">يا له من عمل رائع!</p>
+        <h1 class="s1-title s1-title--c">هذان تمرينان إضافيان بمستوى صعوبة عالٍ</h1>
+      </div>
+      <div class="s1-video-wrap s1-video-wrap--c" data-reveal="2" data-reveal-fade>
+        <div class="s1-video-clip"><video class="s1-char-media" id="s5-video" src="assets/video/s5-yellow-rope.mp4" muted playsinline preload="auto" disablepictureinpicture aria-hidden="true" tabindex="-1"></video></div>
+        <div class="s1-bubble">
+          <svg class="s1-bubble__shape" viewBox="0 0 262 94" aria-hidden="true"><path d="M13.5 1.5H234.5A12 12 0 0 1 246.5 13.5V39L260 47L246.5 55V80.5A12 12 0 0 1 234.5 92.5H13.5A12 12 0 0 1 1.5 80.5V13.5A12 12 0 0 1 13.5 1.5Z" fill="#fff" stroke="#019DE5" stroke-width="3" stroke-linejoin="round"/></svg>
+          <p class="s1-bubble__text"><span>أنا واثق أنكم ستنجحون!</span><span>وإن لم تنجحوا، فقد تعلّمتم شيئًا.</span></p>
+        </div>
+      </div>
+    </div>
+    <button class="btn-continue" type="button" onclick="advanceScreen()"><span class="nav-label"><span>متابعة</span></span></button>
+    <button class="btn-back" type="button" onclick="goBack()"><span class="nav-label"><span>رجوع</span></span></button>
+  </section>
+
+  <!-- ============ S6 (screen 6) — SingleChoiceQuestionImage — slide 33 (standard B 1/2) ============
+       Presenter note: "SingleChoiceQuestion", "רמת חשיבה: יישום", "סרגל שאלה, שאלה 1 מתוך 2", "תמונה:
+       תמונה104", "רמז אחרי טעות ראשונה", Alt Text of תמונה 19. Correct = option 3 (the check). Both
+       question paragraphs are Regular on the slide (no bold run) -> kept Regular (emphasis preservation).
+       Picture = production file "תמונה104.png" (= the embed); zoom. -->
+  <section class="screen" data-screen="6" id="s6">
+    <nav class="progress-question" aria-label="التنقُّل بين الأسئلة">
+      <div class="progress-question__item" data-question="1"><div class="progress-question__icon"></div><span class="progress-question__label">سؤال 1</span></div>
+      <div class="progress-question__connector" data-connector="1"><div class="progress-question__connector-line"></div></div>
+      <div class="progress-question__item" data-question="2"><div class="progress-question__icon"></div><span class="progress-question__label">سؤال 2</span></div>
+    </nav>
+    <div class="scq-question">
+      <div class="scq-main" data-reveal="1">
+        <div class="scq-qtext">
+          <div class="scq-qbody">
+            <p>في التجربة، طُبِّق ضغط متزايد على الهواء المحبوس في المحقنة، وقِيس حجمه.</p>
+            <p id="s6-stem">ما الاستنتاج الذي يمكن استخلاصه من الرسم البياني؟</p>
+          </div>
+        </div>
+        <div class="scq-answers" role="radiogroup" aria-labelledby="s6-stem">
+          <button class="scq-opt" type="button" role="radio" aria-checked="false" data-id="a" onclick="s6q.select('a')">
+            <span class="scq-radio" aria-hidden="true"></span><span class="scq-opt-text">الضغط لا يؤثر في حجم الغاز</span><span class="vh vh-verdict"></span>
+          </button>
+          <button class="scq-opt" type="button" role="radio" aria-checked="false" data-id="b" onclick="s6q.select('b')">
+            <span class="scq-radio" aria-hidden="true"></span><span class="scq-opt-text">كلما طبّقنا ضغطًا أكبر على الغاز، زاد حجمه</span><span class="vh vh-verdict"></span>
+          </button>
+          <button class="scq-opt" type="button" role="radio" aria-checked="false" data-id="c" onclick="s6q.select('c')">
+            <span class="scq-radio" aria-hidden="true"></span><span class="scq-opt-text">كلما طبّقنا ضغطًا أكبر على الغاز، قلّ حجمه</span><span class="vh vh-verdict"></span>
+          </button>
+          <button class="scq-opt" type="button" role="radio" aria-checked="false" data-id="d" onclick="s6q.select('d')">
+            <span class="scq-radio" aria-hidden="true"></span><span class="scq-opt-text">عندما نطبّق ضغطًا، يتحوّل الغاز إلى سائل</span><span class="vh vh-verdict"></span>
+          </button>
+        </div>
+      </div>
+      <div class="scq-img" data-reveal="2" data-reveal-fade>
+        <div class="scq-img-inner" data-zoom-wrapper>
+          <button class="img-zoom-btn" type="button" aria-label="تكبير الصورة" data-zoom-src="assets/img/s6-pressure-volume-graph.png" data-zoom-alt="رسم بياني بعنوان «تأثير الضغط على حجم الهواء». المحور X: «الضغط» (1–5). المحور Y: «حجم الهواء (مل)» (0–100). المنحنى ينخفض: عند الضغط 1 يكون الحجم 100، وعند الضغط 2 يكون 50، وعند الضغط 3 نحو 33، وعند الضغط 4 يكون 25، وعند الضغط 5 يكون 20.">
+            <svg class="img-zoom-btn__icon" aria-hidden="true" width="20" height="20" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8 1C11.8661 1 15 4.13371 15 7.99902C15 11.8643 11.8661 14.998 8 14.998C4.1339 14.998 1.00002 11.8643 1 7.99902C1 4.13371 4.13389 1 8 1Z" stroke="currentColor" stroke-width="2"/><path d="M12.6221 14.188L14.2657 12.6141L19.928 18.5274C20.3626 18.9813 20.347 19.7016 19.8931 20.1362C19.4392 20.5708 18.7189 20.5552 18.2843 20.1013L12.6221 14.188Z" fill="currentColor"/></svg>
+          </button>
+          <img src="assets/img/s6-pressure-volume-graph.png" width="489" height="326" alt="رسم بياني بعنوان «تأثير الضغط على حجم الهواء». المحور X: «الضغط» (1–5). المحور Y: «حجم الهواء (مل)» (0–100). المنحنى ينخفض: عند الضغط 1 يكون الحجم 100، وعند الضغط 2 يكون 50، وعند الضغط 3 نحو 33، وعند الضغط 4 يكون 25، وعند الضغط 5 يكون 20.">
+        </div>
+      </div>
+    </div>
+    <button class="btn-continue" id="s6-check" type="button" disabled onclick="s6q.primary()"><span class="nav-label"><span>هل إجابتي صحيحة؟</span></span></button>
+    <button class="scq-hint" id="s6-hint" type="button" onclick="s6q.openHint()">
+      <svg class="scq-hint-ico" viewBox="0 0 26 22.2883" fill="none" aria-hidden="true"><use href="#ico-bulb"/></svg>
+      <span class="nav-label"><span>هل يمكنني الحصول على تلميح؟</span></span>
+    </button>
+    <button class="btn-back" type="button" onclick="goBack()"><span class="nav-label"><span>رجوع</span></span></button>
+  </section>
+
+  <!-- ============ S7 (screen 7) — SingleChoiceQuestionImage — slide 34 (standard B 2/2) ============
+       Presenter note: "SingleChoiceQuestion", "רמת חשיבה: יישום", "סרגל שאלה, שאלה 2 מתוך 2", "תמונה:
+       תמונה50", "רמז אחרי טעות ראשונה", Alt Text of תמונה 14. Correct = option 3 (the check). Question
+       paragraphs Regular, as on the slide. Picture = production file "תמונה50.png" (the note's file; the
+       slide's embed is a square crop of it); zoom. LAST SCREEN OF THE PART: its resolved button is the
+       decision point "end of standard B" - 2/2 -> part 04 (משימת כיתה), else STOP (main.js). -->
+  <section class="screen" data-screen="7" id="s7">
+    <nav class="progress-question" aria-label="التنقُّل بين الأسئلة">
+      <div class="progress-question__item" data-question="1"><div class="progress-question__icon"></div><span class="progress-question__label">سؤال 1</span></div>
+      <div class="progress-question__connector" data-connector="1"><div class="progress-question__connector-line"></div></div>
+      <div class="progress-question__item" data-question="2"><div class="progress-question__icon"></div><span class="progress-question__label">سؤال 2</span></div>
+    </nav>
+    <div class="scq-question">
+      <div class="scq-main" data-reveal="1">
+        <div class="scq-qtext">
+          <div class="scq-qbody">
+            <p>تلميذة تريد أن تتحقق مما إذا كان الغاز قابلًا للانضغاط أكثر من السائل.</p>
+            <p id="s7-stem">أي تجربة ستساعدها على اختبار ذلك بأفضل طريقة؟</p>
+          </div>
+        </div>
+        <div class="scq-answers" role="radiogroup" aria-labelledby="s7-stem">
+          <button class="scq-opt" type="button" role="radio" aria-checked="false" data-id="a" onclick="s7q.select('a')">
+            <span class="scq-radio" aria-hidden="true"></span><span class="scq-opt-text">وضع الماء والهواء في محقنتين متماثلتين، وتطبيق ضغط مختلف، ومقارنة التغيّر في الحجم</span><span class="vh vh-verdict"></span>
+          </button>
+          <button class="scq-opt" type="button" role="radio" aria-checked="false" data-id="b" onclick="s7q.select('b')">
+            <span class="scq-radio" aria-hidden="true"></span><span class="scq-opt-text">وضع الماء والهواء في محقنتين متماثلتين، وفحص أيّهما يغيّر شكله</span><span class="vh vh-verdict"></span>
+          </button>
+          <button class="scq-opt" type="button" role="radio" aria-checked="false" data-id="c" onclick="s7q.select('c')">
+            <span class="scq-radio" aria-hidden="true"></span><span class="scq-opt-text">وضع الماء والهواء في محقنتين متماثلتين، وتطبيق الضغط نفسه، ومقارنة الحجم</span><span class="vh vh-verdict"></span>
+          </button>
+          <button class="scq-opt" type="button" role="radio" aria-checked="false" data-id="d" onclick="s7q.select('d')">
+            <span class="scq-radio" aria-hidden="true"></span><span class="scq-opt-text">وضع الماء والهواء في محقنتين بحجمين مختلفين، وتطبيق الضغط نفسه، ومقارنة الحجم</span><span class="vh vh-verdict"></span>
+          </button>
+        </div>
+      </div>
+      <div class="scq-img" data-reveal="2" data-reveal-fade>
+        <div class="scq-img-inner" data-zoom-wrapper>
+          <button class="img-zoom-btn" type="button" aria-label="تكبير الصورة" data-zoom-src="assets/img/s7-syringes-water-air.png" data-zoom-alt="محقنتان واقفتان: اليسرى مملوءة بماء أزرق، واليمنى مملوءة بالهواء. تحت المحقنتين ملصقان: «ماء» و«هواء (غاز)».">
+            <svg class="img-zoom-btn__icon" aria-hidden="true" width="20" height="20" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8 1C11.8661 1 15 4.13371 15 7.99902C15 11.8643 11.8661 14.998 8 14.998C4.1339 14.998 1.00002 11.8643 1 7.99902C1 4.13371 4.13389 1 8 1Z" stroke="currentColor" stroke-width="2"/><path d="M12.6221 14.188L14.2657 12.6141L19.928 18.5274C20.3626 18.9813 20.347 19.7016 19.8931 20.1362C19.4392 20.5708 18.7189 20.5552 18.2843 20.1013L12.6221 14.188Z" fill="currentColor"/></svg>
+          </button>
+          <img src="assets/img/s7-syringes-water-air.png" width="427" height="284" alt="محقنتان واقفتان: اليسرى مملوءة بماء أزرق، واليمنى مملوءة بالهواء. تحت المحقنتين ملصقان: «ماء» و«هواء (غاز)».">
+        </div>
+      </div>
+    </div>
+    <button class="btn-continue" id="s7-check" type="button" disabled onclick="s7q.primary()"><span class="nav-label"><span>هل إجابتي صحيحة؟</span></span></button>
+    <button class="scq-hint" id="s7-hint" type="button" onclick="s7q.openHint()">
+      <svg class="scq-hint-ico" viewBox="0 0 26 22.2883" fill="none" aria-hidden="true"><use href="#ico-bulb"/></svg>
+      <span class="nav-label"><span>هل يمكنني الحصول على تلميح؟</span></span>
+    </button>
+    <button class="btn-back" type="button" onclick="goBack()"><span class="nav-label"><span>رجوع</span></span></button>
+  </section>
+
+
+<!-- Problem-report modal (approved-units pattern; posts to the shared Google Form) -->
+  <div id="report-modal" class="report-modal-overlay" hidden role="dialog" aria-modal="true" aria-labelledby="report-modal-title">
+    <div class="report-modal-box">
+      <button class="report-close-btn" onclick="tryCloseReportModal()" aria-label="إغلاق">&#10005;</button>
+      <h2 class="report-modal-title" id="report-modal-title">التبليغ عن مشكلة</h2>
+      <p class="report-modal-body">هل هناك شيء غير واضح أو لا يعمل كما يجب؟ أخبرونا بما حدث لنتمكن من معالجة المشكلة.</p>
+      <div class="report-field">
+        <label class="report-label" for="report-type">ما هو نوع المشكلة *</label>
+        <select class="report-select" id="report-type">
+          <option value="" disabled selected>اختاروا نوع المشكلة</option>
+          <option value="technical">عطل تقني أو شيء ما لا يعمل</option>
+          <option value="unclear">هناك شيء لا أفهمه</option>
+          <option value="other">آخر</option>
+        </select>
+      </div>
+      <div class="report-field">
+        <label class="report-label" for="report-text">ماذا حدث؟ *</label>
+        <textarea class="report-textarea" id="report-text" maxlength="250" rows="4" placeholder="صفوا المشكلة‎..."></textarea>
+        <span class="report-char-count" id="report-char-count">0 / 250</span>
+      </div>
+      <p class="report-error" id="report-error" hidden>يرجى اختيار نوع المشكلة ووصف ما حدث.</p>
+      <div class="report-actions">
+        <button class="report-submit-btn" onclick="submitReport()">إرسال</button>
+        <button class="report-cancel-btn" onclick="tryCloseReportModal()">إلغاء</button>
+      </div>
+      <div class="report-thanks" id="report-thanks" hidden>
+        <p>شكرًا! تم إرسال التبليغ. سنعالج المشكلة في أقرب وقت.</p>
+        <button class="report-submit-btn" onclick="forceCloseReportModal()">إغلاق</button>
+      </div>
+    </div>
+  </div>
+  <div id="report-confirm-modal" class="report-modal-overlay" hidden role="dialog" aria-modal="true" aria-labelledby="confirm-modal-title">
+    <div class="report-modal-box report-confirm-box">
+      <h2 class="report-modal-title" id="confirm-modal-title">هل تريدون إغلاق النافذة فعلًا؟</h2>
+      <p class="report-modal-body">إذا ضغطتم على إغلاق لن يتم إرسال التبليغ</p>
+      <div class="report-actions">
+        <button class="report-cancel-btn" onclick="forceCloseReportModal()">إغلاق النافذة</button>
+        <button class="report-submit-btn" onclick="backToReportForm()">أريد التبليغ</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="js/motion.js"></script>
+<script src="js/main.js"></script>
+<script src="js/report-modal.js"></script>
+</body>
+</html>

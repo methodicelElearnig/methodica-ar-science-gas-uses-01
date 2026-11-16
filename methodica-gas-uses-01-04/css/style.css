@@ -1,0 +1,462 @@
+/* methodica-gas-uses-01-04
+   Component 04 — פעילות בכיתה (משימת כיתה), slides 35-37. Two non-question screens:
+   S0 TransitionScreen B (slide 36), S1 TextWithCallout media=image (slide 37).
+   Chrome copied from methodica-gas-uses-01-01/css/style.css (itself ported from
+   methodica-science-mass-liquid-02-02); copied ranges are marked. Nothing in parts
+   01-03 is edited — the engine is duplicated per part, as in part 02. */
+
+/* ===== Font — Assistant, served locally (assets/fonts) so the text never depends on the school's internet connection
+   (producer 2026-10-06). Only the weights this part uses: 400 / 600 / 700. ===== */
+@font-face { font-family: 'Assistant'; src: url('../assets/fonts/Assistant-Regular.ttf') format('truetype'); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Assistant'; src: url('../assets/fonts/Assistant-SemiBold.ttf') format('truetype'); font-weight: 600; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Assistant'; src: url('../assets/fonts/Assistant-Bold.ttf') format('truetype'); font-weight: 700; font-style: normal; font-display: swap; }
+
+/* ===== Subject theme tokens (Science) — 720-design-guidelines / colors-and-gradients.md ===== */
+:root {
+  --subject-100: #D4F3FF;
+  --subject-300: #B9ECFF;
+  --subject-500: #019DE5;
+  --subject-700: #007AC6;
+  --green-80: #609E12;     /* Feedback/Correct/300 */
+  --green-5:  #EDF8ED;
+  --red-100:  #B20010;     /* Feedback/Incorrect/300 */
+  --red-5:    #FFF0F4;
+  --feedback-correct-200:   #F2FFE8;
+  --feedback-incorrect-200: #FFDBDC;
+  --natural-200: #F3F4F5;
+  --natural-300: #ECECEC;
+  --gray-100: #AEAEAE;     /* Natural/600 */
+  --text:     #222222;
+  --black-100:#303030;     /* Natural/800 */
+
+  --canvas-w: 1280px;
+  --canvas-h: 710px;
+  --bar-h: 74px;
+}
+
+/* ===== Reset / base ===== */
+* { box-sizing: border-box; }
+html, body {
+  margin: 0; padding: 0;
+  width: 100%; height: 100%;
+  overflow: hidden;
+  direction: rtl;
+  font-family: Calibri, Carlito, Arial, sans-serif;
+  background: #fff;
+  color: var(--text);
+}
+button { font-family: inherit; cursor: pointer; }
+img { -webkit-user-drag: none; user-select: none; }
+[hidden] { display: none !important; }
+
+/* ===== Canvas & scaling engine ===== */
+#app {
+  width: var(--canvas-w);
+  height: var(--canvas-h);
+  position: absolute;
+  top: 0; left: 0;
+  transform-origin: top left;
+  background: #fff;
+  overflow: hidden;
+}
+
+.screen {
+  position: absolute;
+  inset: 0;
+  display: none;
+  background: #fff;
+}
+.screen.active { display: block; }
+/* FixedNavigationBar — Figma 196:6351: 74px, white, 0.4px Natural/600 top line */
+.screen::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: var(--bar-h);
+  background: #fff;
+  border-top: 0.4px solid var(--gray-100);
+  z-index: 5;
+}
+
+/* ===== nav button — Figma 196:6020 =====
+   39px pill, min-width 140px, 20px horizontal padding, label Body/B-7
+   (Regular 20) -> Body/B-8 (SemiBold 20) on hover. Sits in the
+   FixedNavigationBar slot: 24px bar padding + 10px slot padding = 34px
+   from the canvas edge, vertically centred in the 74px bar. */
+.btn-continue, .btn-back, .scq-hint {
+  position: absolute;
+  bottom: calc((var(--bar-h) - 39px) / 2);
+  height: 39px; min-width: 140px;
+  display: flex; align-items: center; justify-content: center;
+  padding: 0 20px;
+  border-radius: 1000px;
+  font: 400 20px Calibri, Carlito, Arial, sans-serif;
+  border: none;
+  z-index: 10;
+  white-space: nowrap;
+}
+.btn-continue:not(:disabled):hover, .btn-back:hover, .scq-hint:hover { font-weight: 600; }
+/* Hint button — Figma nav button hint (196:6024 / hover 1645:18704): white, 1px
+   Subject/700, 7.5/20px padding, 6px gap, bulb 26 x 22.3 to the RIGHT of the label
+   (first in the markup, direction rtl); hover = SemiBold label only. Sits 16px left
+   of the 140px check button in the bar's left slot (34 + 140 + 16). */
+.scq-hint {
+  left: 190px; gap: 6px; padding: 7.5px 20px; direction: rtl;
+  background: #fff; border: 1px solid var(--subject-700); color: var(--subject-700);
+}
+.scq-hint-ico { flex: 0 0 26px; width: 26px; height: 22.2883px; }
+.btn-continue {
+  left: 34px;
+  background: linear-gradient(to bottom, #005FBE 9%, #0059B2 23.361%, #003971 100%); /* Subject/Gradient/Science */
+  color: #fff;
+}
+.btn-continue:disabled {
+  background: var(--gray-100);
+  color: var(--black-100);
+  cursor: not-allowed;
+}
+.btn-back {
+  right: 34px;
+  background: #fff;
+  border: 1px solid var(--subject-700);
+  color: var(--subject-700);
+}
+.btn-back:hover { border-width: 1.5px; }
+
+/* Figma "nav label" (2567:20391): an invisible SemiBold copy of the label
+   reserves the hover width so the pill never resizes between states.
+   data-label is filled from the visible text by initNavLabels(). */
+.nav-label { display: inline-grid; }
+.nav-label::before {
+  content: attr(data-label);
+  grid-area: 1 / 1;
+  font-weight: 600;
+  block-size: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+.nav-label > span { grid-area: 1 / 1; }
+
+/* ===== Report Problem — Figma 207:3590 (global, outside all screens) =====
+   88x68 component: icon = exact Figma SVG export of "Report Problem icon"
+   207:3567 (default) / 207:3566 (hover); label is live text. Pinned
+   top-left 32/32 — the component's position in every current approved screen
+   template (4492:37696, 4905:25066, 414:4712, 1045:13096; producer 2026-10-06,
+   replacing the earlier 16/16). */
+.flag-btn {
+  position: absolute; top: 32px; left: 32px; z-index: 30;
+  width: 88px; height: 68px;
+  padding: 10px 4px 8px;
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  background: none; border: none; cursor: pointer;
+}
+.flag-btn__icon {
+  flex: 0 0 38px; width: 38px; height: 38px;
+  background: url('../assets/img/report-problem-icon-default.svg') no-repeat center / contain;
+}
+.flag-btn__label {
+  display: none;
+  width: 80px;
+  font: 600 14px/10px Calibri, Carlito, Arial, sans-serif; /* Figma trims the text box to cap height (10px) */
+  color: var(--subject-500);
+  text-align: center;
+  direction: rtl;
+}
+.flag-btn:hover, .flag-btn:focus-visible { padding-bottom: 10px; }
+.flag-btn:hover .flag-btn__icon,
+.flag-btn:focus-visible .flag-btn__icon { background-image: url('../assets/img/report-problem-icon-hover.svg'); }
+.flag-btn:hover .flag-btn__label,
+.flag-btn:focus-visible .flag-btn__label { display: block; }
+
+/* ===== TransitionScreen — 720-templates TransitionScreen.md =====
+   ShortText variant, Figma "TransitionScreen - B -
+   SectionIntroScreen-ShortText" (4905:25066), ported from part 01's own
+   S9 instance of the component. Composition per the node: the text block's
+   top at y 115 of the centred 1280x710 frame (790 wide), the character box
+   flush with the bar. Text: SelectionScreenTitle Type=Supporting Title —
+   lead-in Body/B-1 (28 Regular) in a 10px-padded frame, 24px stack gap,
+   headline Heading/H-4 (64 Bold), closing line Body/B-1; all trimmed to cap
+   height/baseline, Natural/800. */
+.s1-content { position: absolute; inset: 0; }
+.s1-text {
+  position: absolute; top: calc(50% - 355px + 115px); left: calc(50% - 395px); width: 790px;
+  display: flex; flex-direction: column; align-items: center; gap: 24px;
+  text-align: center; direction: rtl; color: var(--black-100);
+}
+.s1-subtitle { margin: 0; font: 400 28px Calibri, Carlito, Arial, sans-serif; text-box: trim-both cap alphabetic; }
+.s1-title { margin: 0; font: 700 64px Calibri, Carlito, Arial, sans-serif; text-box: trim-both cap alphabetic; }
+/* S8 (slide 13): the long lines broke with "התכונות שלו." / "פתרונות ומוצרים." alone on a short
+   second line; balanced wrapping evens them out, wording and authored <br> unchanged (QA 2026-10-19). */
+#s8 .s1-subtitle { text-wrap: balance; }
+/* 640x360 companion box (production convention for 16:9 clips; the nodes'
+   304x294 frame is an image placeholder), flush with the bar, centred.
+   .s1-video-clip owns the clipping so an overlay (bubble) can extend past
+   the box. Fit shim: --char-scale / --char-shift-y, no-op by default. */
+.s1-video-wrap { position: absolute; left: calc(50% - 320px); bottom: var(--bar-h); width: 640px; height: 360px; }
+.s1-video-clip { position: absolute; inset: 0; overflow: hidden; }
+.s1-char-media {
+  display: block; width: 100%; height: 100%; object-fit: contain;
+  transform: translateY(var(--char-shift-y, 0px)) scale(var(--char-scale, 1)); transform-origin: center center;
+  pointer-events: none;
+}
+
+/* Layout A — Figma "TransitionScreen - A - Example" (4492:37696), producer
+   2026-10-05 for this lomda's practice intro. Text frame 810 wide at y 70
+   of the centred frame: a "title" group (lead-in Body/B-2 28 SemiBold,
+   24px gap, headline Heading/H-4 64 Bold), then 48px to the closing line
+   Body/B-1 28 Regular. Every line trimmed to cap height/baseline (node:
+   lead-in 21px, headline 48px, closing 21px tall; block 162px). */
+.s1-content--a { --s1-text-top: 70px; }
+.s1-content--a .s1-text { width: 810px; left: calc(50% - 405px); gap: 48px; }
+.s1-title-group { display: flex; flex-direction: column; align-items: center; gap: 24px; width: 100%; }
+.s1-subtitle--lead { font-weight: 600; }
+
+/* Stacked modifier — for an instance whose text fills the zone above the
+   character (lead-in + headline + closing line). Same geometry as the base
+   wherever the stack fits: text top at the layout's y (115 by default) of
+   the centred frame, 640x360 box flush with the bar. Where it does not fit
+   (no `text-box` support, so the lines keep their full line boxes), the box
+   shrinks at 16:9 instead of the text running into the character —
+   TransitionScreen.md "Vertical fit at the canvas floor", step 3.
+   Typography is never reduced. */
+.s1-content--stack {
+  top: calc(50% - 355px + var(--s1-text-top, 115px)); bottom: var(--bar-h);
+  display: flex; flex-direction: column; align-items: center; justify-content: space-between;
+}
+.s1-content--stack .s1-text { position: static; flex: none; }
+.s1-content--stack .s1-video-wrap {
+  position: relative; left: auto; bottom: auto;
+  height: 360px; width: auto; aspect-ratio: 16 / 9;
+  flex: 0 1 auto; min-height: 0;
+}
+
+.vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; }
+.hidden { display: none !important; }
+
+/* ===== Content-image card — SingleChoiceQuestionImage "img" column (Figma 196:3320), copied from part 01 ===== */
+/* Image column "img" (96:1426): 8px padding, 1px Natural/600 @50% hairline at radius
+   16 — on the column (::after), so the zoom clone never carries it. The Figma 380 x 380
+   square is the maximum box, not the frame: the frame hugs the image at its own aspect
+   ratio inside it (380 wide for a landscape image, 380 tall for a portrait one), so the
+   hairline traces the picture with no letterbox bands (producer 2026-10-05,
+   _question-template-defaults "Content image frame"). The <img> carries its own
+   width/height attributes, which give the browser the ratio. */
+.scq-img { position: relative; flex: 0 0 auto; width: fit-content; height: fit-content; max-width: 380px; max-height: 380px; padding: 8px; }
+.scq-img::after {
+  content: ''; position: absolute; inset: 8px; border-radius: 16px;
+  box-shadow: inset 0 0 0 1px rgba(174,174,174,.5);
+  pointer-events: none; z-index: 2;
+}
+.scq-img-inner { position: relative; border-radius: 16px; overflow: hidden; background: #fff; }
+.scq-img-inner > img { display: block; width: auto; height: auto; max-width: 364px; max-height: 364px; }
+
+/* ===== Image Zoom — 720-templates _global-components "Image zoom" (as part 01) =====
+   Trigger = Figma "Zoom" (1589:17043): 44px circle, white, 2px inside Subject/500
+   stroke, magnifier from the component (inline SVG, currentColor); hover inverts. */
+.img-zoom-btn {
+  position: absolute; top: 10px; right: 10px; z-index: 3;
+  width: 44px; height: 44px; padding: 0;
+  border: none; border-radius: 100px;
+  background: #fff; box-shadow: inset 0 0 0 2px var(--subject-500);
+  color: var(--subject-500);
+  display: flex; align-items: center; justify-content: center; cursor: pointer;
+}
+.img-zoom-btn:hover { background: var(--subject-500); box-shadow: none; color: #fff; }
+.img-zoom-btn:focus-visible { outline: 2px solid var(--subject-700); outline-offset: 2px; }
+.img-zoom-btn__icon { display: block; width: 20.7149px; height: 20.9231px; }
+.img-zoom-modal { position: absolute; inset: 0; z-index: 40; display: flex; align-items: center; justify-content: center; }
+.img-zoom-modal__backdrop { position: absolute; inset: 0; background: rgba(255,255,255,.8); }
+/* Image Zoom Surface (Figma 4399:22435): hug the media ratio, 24/72 padding.
+   Close remains at (16,16), beside the media; outer radius 24, media radius 16. */
+.img-zoom-modal__panel { position: relative; padding: 24px 72px; background: #fff; border-radius: 24px; overflow: hidden; }
+.img-zoom-modal__stage { position: relative; border-radius: 16px; overflow: hidden; }
+.img-zoom-modal__close {
+  position: absolute; top: 16px; left: 16px; z-index: 2;
+  width: 40px; height: 40px; padding: 0;
+  border: none; border-radius: 100px;
+  background: #fff; box-shadow: inset 0 0 0 2px var(--subject-500);
+  color: var(--subject-500);
+  display: flex; align-items: center; justify-content: center; cursor: pointer;
+}
+.img-zoom-modal__close:hover { background: var(--subject-500); box-shadow: none; color: #fff; }
+.img-zoom-modal__close:focus-visible { outline: 2px solid var(--subject-700); outline-offset: 2px; }
+.img-zoom-modal__close-icon { display: block; width: 15px; height: 15px; }
+
+
+
+/* ===== Copied from part 01's own additions (inline bold, stack gap, placeholders, TextWithCallout) ===== */
+
+/* Inline bold inside TransitionScreen copy (authored emphasis). */
+.s1-subtitle strong { font-weight: 700; }
+/* Stack: when the media box has to shrink (slide 13's two long paragraphs), keep a
+   24px clearance (the B stack gap) between the last text line and the media box, so
+   the descenders of a trimmed line never touch it. No effect where the stack fits. */
+.s1-content--stack { gap: 24px; }
+
+/* ===== Development placeholders — a MISSING production asset, never shipped =====
+   Approved instruction 8 (2026-10-18): a missing media asset is shown as a
+   clearly marked placeholder only; no image or video is generated. data-placeholder
+   names the open question that owns the asset (docs/03-open-questions.md). */
+.ph {
+  display: flex; align-items: center; justify-content: center; text-align: center;
+  box-sizing: border-box; padding: 12px;
+  background: repeating-linear-gradient(45deg, #FFF7D6 0 12px, #FFF0B8 12px 24px);
+  border: 2px dashed #B98A00; border-radius: 16px;
+  font: 600 18px/1.35 Calibri, Carlito, Arial, sans-serif; color: #5C4600; direction: rtl;
+}
+.ph::before { content: 'PLACEHOLDER · ' attr(data-placeholder); position: absolute; margin-top: -1px; transform: translateY(calc(-50% - 2.2em)); font-size: 13px; font-weight: 700; letter-spacing: .02em; opacity: .75; }
+.ph--fill { width: 100%; height: 100%; position: relative; }
+.ph--media { width: 364px; height: 243px; position: relative; }
+.ph--fullbleed {
+  position: absolute; inset: 0 0 var(--bar-h) 0; border-radius: 0; z-index: 0;
+  align-items: flex-end; padding-bottom: 24px; opacity: .55;
+}
+.ph--fullbleed::before { transform: none; top: 12px; }
+.screen > .s1-content { z-index: 1; }
+
+/* ===== TextWithCallout, media=image — as part 01 S0 (slide 3) =====
+   Figma "Screen Templates/TextWithCallout" 982:17031: Section Title Headings/H-6 (40 Bold,
+   Natural/800), centred in a 1050 max-width box at y 64 (30 tall, cap-trimmed); 56 below it
+   the content row, x 40-1240: text column 790 at the right (Body/B-4 24 Regular +
+   Body/B-6 24 Bold, right-aligned, 16 between the two blocks) + 56 + image column 304.
+   Slide 3 adaptation (Q-19): no Speech Bubble, image column top-aligned with the text.
+   The image reuses the shared content-image card (.scq-img: 8px padding + hairline, frame
+   hugs the picture's ratio) with the template's 304 box as the maximum. */
+.twc-title {
+  position: absolute; top: calc(50% - 355px + 64px); left: calc(50% - 525px); width: 1050px;
+  margin: 0; text-align: center; direction: rtl; color: var(--black-100);
+  font: 700 40px/normal Calibri, Carlito, Arial, sans-serif; text-box: trim-both cap alphabetic;
+}
+.twc-row {
+  position: absolute; top: calc(50% - 355px + 150px); left: calc(50% - 640px + 40px); width: 1200px;
+  display: flex; align-items: flex-start; gap: 56px; direction: rtl;
+}
+.twc-text { width: 790px; flex: 0 0 790px; display: flex; flex-direction: column; gap: 16px; color: var(--black-100); text-align: right; }
+.twc-text p { margin: 0; font: 400 22px/normal Calibri, Carlito, Arial, sans-serif; text-box: trim-both cap alphabetic; }
+.twc-text .twc-text__bold { font-weight: 700; }
+.twc-img { max-width: 304px; max-height: 304px; }
+.twc-img .scq-img-inner > img { max-width: 288px; max-height: 288px; }
+
+/* =====================================================================
+   methodica-gas-uses-01-04 additions (below this line)
+   ===================================================================== */
+
+/* ----- S0 (slide 36) — TransitionScreen B with its lead-in -----
+   TransitionScreen.md 5 / B (4905:25066): the lead-in (Body/B-1) sits in a 41px frame with
+   10px padding, so the first glyph is 10px below the block top (y 115) and the lead-in ->
+   headline distance is 34 (24 stack gap + 10). Parts 01-02 never drew a B lead-in, so the
+   frame is added here only. */
+.s1-subtitle--b-lead { padding: 10px 0; }
+
+/* ----- S1 (slide 37) — TextWithCallout, media=image, LOCAL ADAPTATION (C4-02 / C4-03) -----
+   Same template geometry as part 01 S0: H-6 title centred at y 64, content row at y 150,
+   text column 790 (x 450-1240) + 56 + image column 304 (x 90-394; the row is right-justified
+   in the 1200 box, as in Figma 982:17034).
+   - No Speech Bubble (slide 37 has none, as slide 3 - Q-19 precedent); the image column
+     is top-aligned with the text.
+   - Portrait picture (1440x1800, 4:5 - C4-07): the card hugs the picture inside the template's 304
+     box -> picture 230x288, card 246x304, centred in the 304 column (the column's own
+     items-center), x 119-365 / y 150-454. The slide shows it larger (353x441) - C4-03:
+     overridden for S1 at the end of this file (option B).
+   - The slide's rounded grey box (F2F2F2) around "המשימה שלכם:" is authored emphasis of
+     the task. TextWithCallout has no such element; it is kept with radius 24 and padding 24
+     from the existing radius/spacing set (C4-02). Fill: Subject/100 (#D4F3FF) - grey is kept
+     for the "inactive" state (Noa 2026-11-03; replaces Natural/200 #F3F4F5). The box spans
+     the text column, as the slide's box spans the text boxes. */
+.twc-media { flex: 0 0 304px; width: 304px; display: flex; justify-content: center; }
+.twc-text .twc-task {
+  margin: 0; padding: 24px; border-radius: 24px; background: var(--subject-100);
+  display: flex; flex-direction: column;
+}
+/* S1 only — C4-03 option B (Noa 2026-10-19): approved local enlargement, close to slide 37
+   (picture 353x441 there). Picture 338x422 (4:5) in a 354 card (8px padding), card x 40-394 /
+   y 150-588 at 1280x710: the 40 side margin and the template's 56 gap to the text column are
+   kept (790 + 56 + 354 = 1200), so the text column, the task box and the nav do not move.
+   The shared .twc-img / .twc-media rules above are unchanged. */
+#s1 .twc-media { flex: 0 0 354px; width: 354px; }
+#s1 .twc-img { max-width: 354px; max-height: 438px; }
+#s1 .twc-img .scq-img-inner > img { max-width: 338px; max-height: 422px; }
+/* S1 only — task box alignment and spacing (Noa 2026-10-25, option A; box edge Noa 2026-10-26):
+   - The box starts on the text column's right edge (x 1240, the line of "התבוננו"), so the
+     text inside it sits 24px (its padding) to the left of the other paragraphs.
+   - The box hugs its content (widest line + 24 padding each side) instead of spanning the
+     790 column; align-self: flex-start keeps it on the right in the RTL column.
+   - One blank line before "שימו לב!" (the slide's empty paragraph at the end of the box, C4-06):
+     16 column gap + 32 = 48 between the box and the paragraph. */
+#s1 .twc-text .twc-task { align-self: flex-start; }
+#s1 .twc-task + p { margin-top: 32px; }
+
+/* ===== Arabic build overrides (widths were sized for the Hebrew labels) ===== */
+/* Hint button sat at left:190px = right of the 140px Hebrew check button; the Arabic check label is ~181px wide. */
+.scq-hint { left: 240px; }
+/* Flag button hover label "هل وجدتم مشكلة؟" wrapped into two overlapping lines (80px box, 10px line-height): one line. */
+.flag-btn__label { width: auto; white-space: nowrap; line-height: 1.3; }
+.flag-btn:hover, .flag-btn:focus-visible { height: auto; min-height: 68px; }
+
+/* ===== Problem-report modal, copied from the approved יעד 14 Arabic build (unit-css/styles.css) ===== */
+/* ---------- Problem-report modal (approved-units pattern, theme tokens) ---------- */
+.report-modal-overlay { position: absolute; inset: 0; z-index: 200; background: rgba(0,0,0,0.55); display: flex; align-items: center; justify-content: center; direction: rtl; }
+
+.report-modal-overlay[hidden] { display: none; }
+
+.report-modal-box { width: 520px; background: #fff; border-radius: 16px; padding: 36px 36px 28px; position: relative; box-shadow: 0 20px 60px rgba(0,0,0,0.35); display: flex; flex-direction: column; gap: 18px; direction: rtl; }
+
+.report-confirm-box { width: 420px; padding: 40px 36px 32px; gap: 20px; }
+
+.report-close-btn { position: absolute; top: 14px; left: 14px; width: 32px; height: 32px; border: none; background: none; font-size: 17px; color: #8A9AAA; cursor: pointer; border-radius: 50%; display: flex; align-items: center; justify-content: center; outline: none; transition: background 0.12s, color 0.12s; }
+
+.report-close-btn:hover { background: #F0F2F5; color: #303030; }
+
+.report-close-btn:focus-visible { outline: 2px solid var(--subject-500); }
+
+.report-modal-title { font-size: 26px; font-weight: 700; color: #1A2744; line-height: 1.2; }
+
+.report-modal-body { font-size: 18px; color: #5A6A7A; line-height: 1.5; margin-top: -6px; }
+
+.report-field { display: flex; flex-direction: column; gap: 6px; }
+
+.report-label { font-size: 16px; font-weight: 600; color: #303030; }
+
+.required-star { color: #D32F2F; }
+
+.report-select { height: 44px; border: 2px solid #C9CED8; border-radius: 10px; padding: 0 14px; font-family: Calibri, Carlito, Arial, sans-serif; font-size: 17px; color: #303030; background: #fff; direction: rtl; outline: none; cursor: pointer; transition: border-color 0.12s; }
+
+.report-select:focus { border-color: var(--subject-500); }
+
+.report-textarea { border: 2px solid #C9CED8; border-radius: 10px; padding: 12px 14px; font-family: Calibri, Carlito, Arial, sans-serif; font-size: 16px; color: #303030; direction: rtl; resize: none; outline: none; transition: border-color 0.12s; line-height: 1.5; }
+
+.report-textarea:focus { border-color: var(--subject-500); }
+
+.report-char-count { font-size: 13px; color: #8A9AAA; text-align: left; direction: ltr; }
+
+.report-actions { display: flex; flex-direction: row; gap: 12px; direction: rtl; margin-top: 4px; }
+
+.report-error { color: #d33; font-size: 14px; margin: 4px 0 8px; direction: rtl; }
+
+.report-thanks { text-align: center; padding: 8px 0; direction: rtl; }
+
+.report-submit-btn { height: 44px; padding: 0 32px; background: linear-gradient(180deg, var(--subject-500), var(--subject-700)); color: #fff; border: none; border-radius: 50px; font-family: Calibri, Carlito, Arial, sans-serif; font-size: 18px; font-weight: 600; cursor: pointer; outline: none; transition: opacity 0.12s; }
+
+.report-submit-btn:hover { opacity: 0.88; }
+
+.report-submit-btn:focus-visible { outline: 3px solid var(--subject-500); outline-offset: 3px; }
+
+.report-cancel-btn { height: 44px; padding: 0 28px; background: #fff; color: #5A6A7A; border: 2px solid #C9CED8; border-radius: 50px; font-family: Calibri, Carlito, Arial, sans-serif; font-size: 18px; font-weight: 400; cursor: pointer; outline: none; transition: border-color 0.12s, color 0.12s; }
+
+.report-cancel-btn:hover { border-color: #8A9AAA; color: #303030; }
+
+.report-cancel-btn:focus-visible { outline: 3px solid var(--subject-500); outline-offset: 3px; }
+/* The report modal's select: the NATIVE chevron is drawn by the UA hard
+   against the field's inline-end (left, in RTL) edge, and `padding-left`
+   cannot move it - which is why the earlier padding-only fix left it looking
+   stuck to the border. Draw our own chevron instead and place it properly.
+   (producer 05.10) */
+.report-select {
+  appearance: none; -webkit-appearance: none; -moz-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%23303030' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: left 16px center;
+  padding-left: 40px !important;   /* keeps the longest option clear of it */
+}
+/* fade only when the window opens (display none -> flex); .m-popup would restart it on every typed letter */
+.report-modal-overlay:not([hidden]) { animation: m-fade-in var(--m-popup-duration, 260ms) var(--m-ease, ease-out) both; }

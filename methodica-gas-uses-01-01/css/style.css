@@ -1,0 +1,1338 @@
+/* methodica-gas-uses-01-01
+   Component 01 — ללמוד משהו חדש (הוק + הקנייה + שאלות חימום), slides 2-18.
+   Built per 720-templates / 720-design-guidelines on a 1280x710 canvas. Global
+   chrome is ported verbatim from methodica-science-mass-liquid-02-02 (the newest
+   approved science reference) so this unit carries the same 720 chrome. */
+
+/* ===== Font — Assistant, served locally (assets/fonts) so the text never depends on the school's internet connection
+   (producer 2026-10-06). Only the weights this part uses: 400 / 600 / 700. ===== */
+@font-face { font-family: 'Assistant'; src: url('../assets/fonts/Assistant-Regular.ttf') format('truetype'); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Assistant'; src: url('../assets/fonts/Assistant-SemiBold.ttf') format('truetype'); font-weight: 600; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Assistant'; src: url('../assets/fonts/Assistant-Bold.ttf') format('truetype'); font-weight: 700; font-style: normal; font-display: swap; }
+
+/* ===== Subject theme tokens (Science) — 720-design-guidelines / colors-and-gradients.md ===== */
+:root {
+  --subject-100: #D4F3FF;
+  --subject-300: #B9ECFF;
+  --subject-500: #019DE5;
+  --subject-700: #007AC6;
+  --green-80: #609E12;     /* Feedback/Correct/300 */
+  --green-5:  #EDF8ED;
+  --red-100:  #B20010;     /* Feedback/Incorrect/300 */
+  --red-5:    #FFF0F4;
+  --feedback-correct-200:   #F2FFE8;
+  --feedback-incorrect-200: #FFDBDC;
+  --natural-200: #F3F4F5;
+  --natural-300: #ECECEC;
+  --gray-100: #AEAEAE;     /* Natural/600 */
+  --text:     #222222;
+  --black-100:#303030;     /* Natural/800 */
+
+  --canvas-w: 1280px;
+  --canvas-h: 710px;
+  --bar-h: 74px;
+}
+
+/* ===== Reset / base ===== */
+* { box-sizing: border-box; }
+html, body {
+  margin: 0; padding: 0;
+  width: 100%; height: 100%;
+  overflow: hidden;
+  direction: rtl;
+  font-family: Calibri, Carlito, Arial, sans-serif;
+  background: #fff;
+  color: var(--text);
+}
+button { font-family: inherit; cursor: pointer; }
+img { -webkit-user-drag: none; user-select: none; }
+[hidden] { display: none !important; }
+
+/* ===== Canvas & scaling engine ===== */
+#app {
+  width: var(--canvas-w);
+  height: var(--canvas-h);
+  position: absolute;
+  top: 0; left: 0;
+  transform-origin: top left;
+  background: #fff;
+  overflow: hidden;
+}
+
+.screen {
+  position: absolute;
+  inset: 0;
+  display: none;
+  background: #fff;
+}
+.screen.active { display: block; }
+/* FixedNavigationBar — Figma 196:6351: 74px, white, 0.4px Natural/600 top line */
+.screen::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: var(--bar-h);
+  background: #fff;
+  border-top: 0.4px solid var(--gray-100);
+  z-index: 5;
+}
+
+/* ===== nav button — Figma 196:6020 =====
+   39px pill, min-width 140px, 20px horizontal padding, label Body/B-7
+   (Regular 20) -> Body/B-8 (SemiBold 20) on hover. Sits in the
+   FixedNavigationBar slot: 24px bar padding + 10px slot padding = 34px
+   from the canvas edge, vertically centred in the 74px bar. */
+.btn-continue, .btn-back, .scq-hint {
+  position: absolute;
+  bottom: calc((var(--bar-h) - 39px) / 2);
+  height: 39px; min-width: 140px;
+  display: flex; align-items: center; justify-content: center;
+  padding: 0 20px;
+  border-radius: 1000px;
+  font: 400 20px Calibri, Carlito, Arial, sans-serif;
+  border: none;
+  z-index: 10;
+  white-space: nowrap;
+}
+.btn-continue:not(:disabled):hover, .btn-back:hover, .scq-hint:hover { font-weight: 600; }
+/* Hint button — Figma nav button hint (196:6024 / hover 1645:18704): white, 1px
+   Subject/700, 7.5/20px padding, 6px gap, bulb 26 x 22.3 to the RIGHT of the label
+   (first in the markup, direction rtl); hover = SemiBold label only. Sits 16px left
+   of the 140px check button in the bar's left slot (34 + 140 + 16). */
+.scq-hint {
+  left: 190px; gap: 6px; padding: 7.5px 20px; direction: rtl;
+  background: #fff; border: 1px solid var(--subject-700); color: var(--subject-700);
+}
+.scq-hint-ico { flex: 0 0 26px; width: 26px; height: 22.2883px; }
+.btn-continue {
+  left: 34px;
+  background: linear-gradient(to bottom, #005FBE 9%, #0059B2 23.361%, #003971 100%); /* Subject/Gradient/Science */
+  color: #fff;
+}
+.btn-continue:disabled {
+  background: var(--gray-100);
+  color: var(--black-100);
+  cursor: not-allowed;
+}
+.btn-back {
+  right: 34px;
+  background: #fff;
+  border: 1px solid var(--subject-700);
+  color: var(--subject-700);
+}
+.btn-back:hover { border-width: 1.5px; }
+
+/* Figma "nav label" (2567:20391): an invisible SemiBold copy of the label
+   reserves the hover width so the pill never resizes between states.
+   data-label is filled from the visible text by initNavLabels(). */
+.nav-label { display: inline-grid; }
+.nav-label::before {
+  content: attr(data-label);
+  grid-area: 1 / 1;
+  font-weight: 600;
+  block-size: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+.nav-label > span { grid-area: 1 / 1; }
+
+/* ===== Report Problem — Figma 207:3590 (global, outside all screens) =====
+   88x68 component: icon = exact Figma SVG export of "Report Problem icon"
+   207:3567 (default) / 207:3566 (hover); label is live text. Pinned
+   top-left 32/32 — the component's position in every current approved screen
+   template (4492:37696, 4905:25066, 414:4712, 1045:13096; producer 2026-10-06,
+   replacing the earlier 16/16). */
+.flag-btn {
+  position: absolute; top: 32px; left: 32px; z-index: 30;
+  width: 88px; height: 68px;
+  padding: 10px 4px 8px;
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  background: none; border: none; cursor: pointer;
+}
+.flag-btn__icon {
+  flex: 0 0 38px; width: 38px; height: 38px;
+  background: url('../assets/img/report-problem-icon-default.svg') no-repeat center / contain;
+}
+.flag-btn__label {
+  display: none;
+  width: 80px;
+  font: 600 14px/10px Calibri, Carlito, Arial, sans-serif; /* Figma trims the text box to cap height (10px) */
+  color: var(--subject-500);
+  text-align: center;
+  direction: rtl;
+}
+.flag-btn:hover, .flag-btn:focus-visible { padding-bottom: 10px; }
+.flag-btn:hover .flag-btn__icon,
+.flag-btn:focus-visible .flag-btn__icon { background-image: url('../assets/img/report-problem-icon-hover.svg'); }
+.flag-btn:hover .flag-btn__label,
+.flag-btn:focus-visible .flag-btn__label { display: block; }
+
+/* ===== TransitionScreen — 720-templates TransitionScreen.md =====
+   ShortText variant, Figma "TransitionScreen - B -
+   SectionIntroScreen-ShortText" (4905:25066), ported from part 01's own
+   S9 instance of the component. Composition per the node: the text block's
+   top at y 115 of the centred 1280x710 frame (790 wide), the character box
+   flush with the bar. Text: SelectionScreenTitle Type=Supporting Title —
+   lead-in Body/B-1 (28 Regular) in a 10px-padded frame, 24px stack gap,
+   headline Heading/H-4 (64 Bold), closing line Body/B-1; all trimmed to cap
+   height/baseline, Natural/800. */
+.s1-content { position: absolute; inset: 0; }
+.s1-text {
+  position: absolute; top: calc(50% - 355px + 115px); left: calc(50% - 395px); width: 790px;
+  display: flex; flex-direction: column; align-items: center; gap: 24px;
+  text-align: center; direction: rtl; color: var(--black-100);
+}
+.s1-subtitle { margin: 0; font: 400 28px Calibri, Carlito, Arial, sans-serif; text-box: trim-both cap alphabetic; }
+.s1-title { margin: 0; font: 700 64px Calibri, Carlito, Arial, sans-serif; text-box: trim-both cap alphabetic; }
+/* S8 (slide 13): the long lines broke with "התכונות שלו." / "פתרונות ומוצרים." alone on a short
+   second line; balanced wrapping evens them out, wording and authored <br> unchanged (QA 2026-10-19). */
+#s8 .s1-subtitle { text-wrap: balance; }
+/* S8 narration (request 2026-11-11): phrases fade in with the voice (.narr-on is set by s8Enter();
+   without it - audio unavailable - all text stays visible). The pause/play button reuses the hint
+   pill (white, Subject/700) in the bar's left slot, next to Continue. */
+#s8.narr-on .s8-seg { opacity: 0; transition: opacity .4s ease; }
+#s8.narr-on .s8-seg.is-shown { opacity: 1; }
+.s8-audio-btn { cursor: pointer; }
+.s8-audio-ico { flex: 0 0 18px; width: 18px; height: 18px; }
+.s8-audio-btn:focus-visible { outline: 2px solid var(--subject-700); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { #s8.narr-on .s8-seg { transition: none; } }
+/* 640x360 companion box (production convention for 16:9 clips; the nodes'
+   304x294 frame is an image placeholder), flush with the bar, centred.
+   .s1-video-clip owns the clipping so an overlay (bubble) can extend past
+   the box. Fit shim: --char-scale / --char-shift-y, no-op by default. */
+.s1-video-wrap { position: absolute; left: calc(50% - 320px); bottom: var(--bar-h); width: 640px; height: 360px; }
+.s1-video-clip { position: absolute; inset: 0; overflow: hidden; }
+.s1-char-media {
+  display: block; width: 100%; height: 100%; object-fit: contain;
+  transform: translateY(var(--char-shift-y, 0px)) scale(var(--char-scale, 1)); transform-origin: center center;
+  pointer-events: none;
+}
+
+/* Layout A — Figma "TransitionScreen - A - Example" (4492:37696), producer
+   2026-10-05 for this lomda's practice intro. Text frame 810 wide at y 70
+   of the centred frame: a "title" group (lead-in Body/B-2 28 SemiBold,
+   24px gap, headline Heading/H-4 64 Bold), then 48px to the closing line
+   Body/B-1 28 Regular. Every line trimmed to cap height/baseline (node:
+   lead-in 21px, headline 48px, closing 21px tall; block 162px). */
+.s1-content--a { --s1-text-top: 70px; }
+.s1-content--a .s1-text { width: 810px; left: calc(50% - 405px); gap: 48px; }
+.s1-title-group { display: flex; flex-direction: column; align-items: center; gap: 24px; width: 100%; }
+.s1-subtitle--lead { font-weight: 600; }
+
+/* Stacked modifier — for an instance whose text fills the zone above the
+   character (lead-in + headline + closing line). Same geometry as the base
+   wherever the stack fits: text top at the layout's y (115 by default) of
+   the centred frame, 640x360 box flush with the bar. Where it does not fit
+   (no `text-box` support, so the lines keep their full line boxes), the box
+   shrinks at 16:9 instead of the text running into the character —
+   TransitionScreen.md "Vertical fit at the canvas floor", step 3.
+   Typography is never reduced. */
+.s1-content--stack {
+  top: calc(50% - 355px + var(--s1-text-top, 115px)); bottom: var(--bar-h);
+  display: flex; flex-direction: column; align-items: center; justify-content: space-between;
+}
+.s1-content--stack .s1-text { position: static; flex: none; }
+.s1-content--stack .s1-video-wrap {
+  position: relative; left: auto; bottom: auto;
+  height: 360px; width: auto; aspect-ratio: 16 / 9;
+  flex: 0 1 auto; min-height: 0;
+}
+
+.vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; }
+.hidden { display: none !important; }
+
+/* ===== Progress question — 720-templates _global-components "Progress Question" =====
+   Figma "Progress question" in the question screens (top 48 of the centred frame):
+   items 43 wide, gap 4, 24px Progress Status Icons, 8px to a 15px Regular label,
+   64px connectors with a 1.5px line at 11.5px. Icon states follow the Science
+   "Progress Status Icons" exports: not visited = white disc, 1.5px Natural/300 ring,
+   7.2px #D9D9D9 dot; current = Subject/300 halo, 19.2px white ring with a 2px
+   Subject/500 stroke, 7.2px Subject/500 dot; correct / incorrect = Subject/500 disc
+   with the white check / X (vectors exported from the component). Label Natural/300
+   right-aligned until visited, then #222 centred. Connector Natural/300, then
+   rgba(0,0,0,.6) once the question before it is resolved. */
+.progress-question {
+  position: absolute; top: calc(50% - 355px + 48px); left: 50%; transform: translateX(-50%);
+  display: flex; align-items: flex-start; justify-content: center;
+  gap: 4px; direction: rtl; z-index: 20;
+}
+.progress-question__item { display: flex; flex-direction: column; align-items: center; gap: 8px; width: 43px; flex: 0 0 auto; }
+.progress-question__connector { display: flex; align-items: center; justify-content: center; padding-top: 11.5px; width: 64px; flex: 0 0 auto; }
+.progress-question__connector-line { width: 100%; height: 1.5px; border-radius: 2px; background: var(--natural-300); }
+.progress-question__connector--visited .progress-question__connector-line { background: rgba(0, 0, 0, 0.6); }
+.progress-question__icon {
+  position: relative; width: 24px; height: 24px; flex: 0 0 24px; border-radius: 50%;
+  background: #fff; box-shadow: inset 0 0 0 1.5px var(--natural-300);
+}
+.progress-question__icon::after {
+  content: ''; position: absolute; inset: 0; margin: auto;
+  width: 7.2px; height: 7.2px; border-radius: 50%; box-sizing: border-box;
+  background: #D9D9D9; border: 0.5px solid var(--natural-300);
+}
+.progress-question__icon--current { background: var(--subject-300); box-shadow: none; }
+.progress-question__icon--current::before {
+  content: ''; position: absolute; inset: 0; margin: auto;
+  width: 19.2px; height: 19.2px; border-radius: 50%; box-sizing: border-box;
+  background: #fff; border: 2px solid var(--subject-500);
+}
+.progress-question__icon--current::after { background: var(--subject-500); border: none; z-index: 1; }
+.progress-question__icon--correct, .progress-question__icon--incorrect { background-color: var(--subject-500); box-shadow: none; }
+.progress-question__icon--correct::after, .progress-question__icon--incorrect::after { content: none; }
+.progress-question__glyph { display: none; position: absolute; inset: 0; width: 24px; height: 24px; }
+.progress-question__icon--correct .progress-question__glyph--check,
+.progress-question__icon--incorrect .progress-question__glyph--x { display: block; }
+.progress-question__label { font: 400 15px/normal Calibri, Carlito, Arial, sans-serif; color: var(--natural-300); text-align: right; white-space: nowrap; text-box: trim-both cap alphabetic; }
+.progress-question__label--visited { color: var(--text); text-align: center; }
+
+/* ===== DragAndDropQuestion — paragraph-blanks LOCAL VARIANT (S1, slide 53) =====
+   Shell = Figma DragAndDropMatchingQuestion (462:7038): 383px image column at x 40,
+   text column x 463 / 777 wide, both from y 131 of the centred frame. Delta from the
+   template (producer 2026-10-05): the drop targets are inline blanks in the paragraph,
+   and the 8 words sit under it. Blank + word states = Drag&Drop State (1249:32691) at
+   the 42px text-pill size of part 01 S7 (ImageTopDragAndDropQuestion 5340:25539):
+   blank Default #F3F4F5 + 1px dashed rgba(0,0,0,.6) / Hover white + dashed Subject/500 /
+   Dropped Subject/100 + 1.5px Subject/500 / Correct + Incorrect white + 1.5px green / red
+   with the 26px verdict mark; word = white, 1.5px Natural/300, radius 10, Body/B-4,
+   Selected = 1.5px Subject/500. Every pill shares one width (fits the longest word plus
+   the mark), so placing, checking or toggling never reflows the paragraph. Every
+   visual rule of a word / placed word is on its own class, so the pointer-drag clone
+   (appended to <body>) keeps it. Candidate for promotion as a DragAndDropQuestion
+   "Paragraph" layout. */
+.ddqp-main {
+  position: absolute; top: calc(50% - 355px + 131px); left: calc(50% - 640px + 463px); width: 777px;
+  display: flex; flex-direction: column; gap: 32px; direction: rtl;
+  --ddqp-pill-w: 160px;
+}
+.ddqp-text { display: flex; flex-direction: column; gap: 16px; }
+.ddqp-title { margin: 0; font: 700 22px/normal Calibri, Carlito, Arial, sans-serif; color: var(--subject-500); text-align: right; text-box: trim-both cap alphabetic; }
+/* Lines are 52px apart so a 42px blank sits inside a line with 5px clear above and
+   below; consecutive source paragraphs get no extra space (line-height only). */
+.ddqp-para { font: 400 22px/52px Calibri, Carlito, Arial, sans-serif; color: var(--black-100); text-align: right; }
+.ddqp-para p { margin: 0; }
+/* A blank never wraps away from the word before it or the punctuation after it. */
+.ddqp-nobr { white-space: nowrap; }
+.ddqp-zone {
+  display: inline-flex; vertical-align: middle; position: relative; top: -2px;
+  width: var(--ddqp-pill-w); height: 42px; box-sizing: border-box; border-radius: 12px;
+  background: var(--natural-200); border: 1px dashed rgba(0, 0, 0, 0.6);
+  align-items: center; gap: 10px; padding: 0 16px; direction: rtl;
+  line-height: normal; cursor: default; outline: none;
+}
+/* Screen 13: extra 4px between "גז" and the blank (approved 2026-10-25). */
+#s13-t1 { margin-inline-start: 4px; }
+.ddqp-zone.drag-over { background: #fff; border: 1px dashed var(--subject-500); }
+.ddqp-zone.occupied { background: var(--subject-100); border: 1.5px solid var(--subject-500); }
+.ddqp-zone.correct, .ddqp-zone.wrong { background: #fff; }
+.ddqp-zone.correct { border: 1.5px solid var(--green-80); }
+.ddqp-zone.wrong { border: 1.5px solid var(--red-100); }
+.ddqp-zone:focus-visible { box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--subject-500); }
+.ddqp-mark { flex: 0 0 26px; width: 26px; height: 26px; background: center / 26px 26px no-repeat; }
+.ddqp-zone.correct .ddqp-mark { background-image: url('../assets/img/answer-radio-correct.svg'); }
+.ddqp-zone.wrong .ddqp-mark { background-image: url('../assets/img/answer-radio-incorrect.svg'); }
+.ddqp-placed {
+  flex: 1 1 auto; min-width: 0; height: 100%; display: flex; align-items: center;
+  font: 400 22px/normal Calibri, Carlito, Arial, sans-serif; color: var(--black-100); direction: rtl; text-align: right;
+  white-space: nowrap; cursor: grab; touch-action: none; user-select: none;
+}
+.ddqp-zone.locked .ddqp-placed { cursor: default; }
+.ddqp-bank { display: flex; flex-wrap: wrap; gap: 20px 24px; justify-content: flex-start; width: calc(4 * var(--ddqp-pill-w) + 3 * 24px); }
+.ddqp-slot { width: var(--ddqp-pill-w); height: 42px; }
+.ddqp-chip {
+  width: var(--ddqp-pill-w); height: 42px; box-sizing: border-box; margin: 0; padding: 0 16px;
+  background: #fff; border: 1.5px solid var(--natural-300); border-radius: 10px;
+  font: 400 22px/normal Calibri, Carlito, Arial, sans-serif; color: var(--black-100);   /* drag-and-drop item capsule = 22px (typography.md; QA 2026-10-07) */
+  direction: rtl; text-align: right; white-space: nowrap;
+  display: flex; align-items: center; cursor: grab; touch-action: none; user-select: none;
+}
+.ddqp-chip.is-selected, .ddqp-chip.dragging, .ddqp-chip.pointer-drag-ghost,
+.ddqp-placed.pointer-drag-ghost { border: 1.5px solid var(--subject-500); }
+.ddqp-placed.pointer-drag-ghost { background: #fff; border-radius: 10px; padding: 0 16px; box-sizing: border-box; }
+.ddqp-chip.is-placed { visibility: hidden; }
+.ddqp-chip:focus-visible { outline: 2px solid var(--subject-500); outline-offset: 2px; }
+.ddqp-chip.is-placed:focus-visible { outline: none; }
+/* Content image — the Figma screen's 383px image frame (the drop-zone dashing is not
+   carried over: this image is not a target). 3px rgba(201,206,216,.4) frame, radius 16,
+   as part 01's image frames. The portrait art is cropped to the square on screen
+   (flag and figure kept). Decorative (producer 2026-10-05): no zoom. */
+.ddqp-media {
+  position: absolute; top: calc(50% - 355px + 131px); left: calc(50% - 640px + 40px);
+  width: 383px; height: 383px; box-sizing: border-box;
+  background: #fff; border: 3px solid rgba(201, 206, 216, 0.4); border-radius: 16px; overflow: hidden;
+}
+.ddqp-img-inner { position: relative; width: 100%; height: 100%; }
+.ddqp-img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 50% 36%; pointer-events: none; }
+
+/* ===== Feedback popup — Figma "Popup Feedback" size=Short (217:4133 Correct /
+   2464:28288 + 2464:28331 Incorrect with the answer toggle), as part 01:
+   426px, 24px padding and gaps, radius 12, 0.3px Natural/600 stroke, no shadow.
+   Title Bold 20, body Regular 20, #222. Default position flush with the left edge
+   and the top of the bar — the question-screen states place it at x 0, bottom on
+   the bar line (DragAndDropMatchingQuestion State 07 474:7526, ImageTop 5340:25524;
+   producer 2026-10-05). resetPopupPosition() returns it there on every open. The
+   answer-toggle button sits on the right (Figma counter-axis MAX). */
+.scq-popup {
+  position: absolute; z-index: 25;
+  left: 0; top: auto;
+  bottom: var(--bar-h);
+  width: 426px;
+  display: flex; flex-direction: column; gap: 24px;
+  padding: 24px; border-radius: 12px;
+  border: 0.3px solid var(--gray-100);
+  direction: rtl; text-align: right; color: var(--text);
+  cursor: move; touch-action: none; user-select: none;
+}
+.scq-popup-title { margin: 0; font: 700 20px Calibri, Carlito, Arial, sans-serif; text-box: trim-both cap alphabetic; }
+.scq-popup-body { font: 400 20px Calibri, Carlito, Arial, sans-serif; text-box: trim-both cap alphabetic; }
+.scq-popup-body p { margin: 0; }
+.scq-popup.type-correct { background: var(--feedback-correct-200); }
+.scq-popup.type-retry, .scq-popup.type-wrong2 { background: var(--feedback-incorrect-200); }
+.scq-popup-actions { display: flex; justify-content: flex-start; }
+/* ShowAnswer button (196:6020, neutral): white, #222, 1px #484848, 39px; hover = weight only. */
+/* A flex container, like the nav buttons: as a plain block the label grid would sit
+   on the baseline of its zero-height reserve copies and drop below the pill. */
+.popup-action {
+  display: inline-flex; align-items: center; justify-content: center; white-space: nowrap;
+  height: 39px; padding: 0 20px; border-radius: 1000px;
+  background: #fff; color: #222; border: 1px solid #484848;
+  font: 400 20px Calibri, Carlito, Arial, sans-serif; cursor: pointer;
+}
+.popup-action:hover { font-weight: 600; }
+.nav-label > .nav-label__reserve { grid-area: 1 / 1; font-weight: 600; block-size: 0; visibility: hidden; pointer-events: none; }
+
+/* ===== SingleChoiceQuestionImage (S2, slide 54) — Figma 196:3320, as part 01 S2 =====
+   Content in the centred 1280x710 frame. "question" row: top 139, 40px sides,
+   16px gap; image column left, text column right. Text roles trimmed to cap
+   height / baseline to reproduce the component geometry (46px option, 24px gaps). */
+.scq-question {
+  position: absolute;
+  left: calc(50% - 640px + 40px); width: 1200px;
+  top: calc(50% - 355px + 139px);
+  display: flex; gap: 16px; align-items: flex-start; justify-content: space-between;
+}
+/* Text column (521:13324): text -> answers, right-aligned. Gap 48px = Figma 24 + one 24px body line
+   (approved local change, Noa 2026-10-26: the Figma 24 read too tight with trimmed text). */
+.scq-main { flex: 1 1 0; min-width: 360px; display: flex; flex-direction: column; align-items: flex-start; gap: 48px; }
+/* "text" (521:13250): 792px; body slots 24px apart (Body/B-4 context, Body/B-6 stem). */
+.scq-qtext { width: 792px; max-width: 100%; display: flex; flex-direction: column; gap: 16px; text-align: right; }
+.scq-qbody { display: flex; flex-direction: column; gap: 24px; color: var(--black-100); }
+.scq-qbody p { margin: 0; font: 400 22px Calibri, Carlito, Arial, sans-serif; text-box: trim-both cap alphabetic; }
+.scq-qbody .scq-qstem { font-weight: 700; }
+/* Heading above the body paragraph (S4/S5 "ניסוי ..."): bold + Subject/500 (Noa 2026-11-03). */
+.scq-qbody .scq-qtitle { color: var(--subject-500); }
+/* Image column "img" (96:1426): 8px padding, 1px Natural/600 @50% hairline at radius
+   16 — on the column (::after), so the zoom clone never carries it. The Figma 380 x 380
+   square is the maximum box, not the frame: the frame hugs the image at its own aspect
+   ratio inside it (380 wide for a landscape image, 380 tall for a portrait one), so the
+   hairline traces the picture with no letterbox bands (producer 2026-10-05,
+   _question-template-defaults "Content image frame"). The <img> carries its own
+   width/height attributes, which give the browser the ratio. */
+.scq-img { position: relative; flex: 0 0 auto; width: fit-content; height: fit-content; max-width: 380px; max-height: 380px; padding: 8px; }
+.scq-img::after {
+  content: ''; position: absolute; inset: 8px; border-radius: 16px;
+  box-shadow: inset 0 0 0 1px rgba(174,174,174,.5);
+  pointer-events: none; z-index: 2;
+}
+.scq-img-inner { position: relative; border-radius: 16px; overflow: hidden; background: #fff; }
+.scq-img-inner > img { display: block; width: auto; height: auto; max-width: 364px; max-height: 364px; }
+/* Answers column (521:13309): fit-content up to the 604px standard width. */
+.scq-answers { display: flex; flex-direction: column; gap: 12px; width: fit-content; max-width: 604px; }
+/* Answer option — "answers" type=one choice (196:6213 Default, 462:6728 selected,
+   196:6216 Correct, 196:6219 Incorrect). Inside strokes = inset box-shadows. */
+.scq-opt {
+  display: flex; align-items: center; gap: 10px;
+  width: auto; min-height: 46px; padding: 12px 20px;
+  border: none; border-radius: 1000px; background: #fff;
+  box-shadow: inset 0 0 0 2px var(--subject-500);
+  font: 400 22px Calibri, Carlito, Arial, sans-serif; color: var(--text);
+  text-align: right; direction: rtl; cursor: pointer;
+}
+.scq-opt-text { flex: 1 1 auto; text-box: trim-both cap alphabetic; }
+/* Without text-box trim (older engines) the option line box is taller and S2's four long options reach 3px under the bar
+   at the canvas floor; a tight line-height keeps the stack inside (QA 2026-10-07). No effect where text-box is supported. */
+@supports not (text-box: trim-both cap alphabetic) { .scq-opt-text { line-height: 1.1; } }
+.scq-opt:focus-visible { outline: 2px solid var(--subject-700); outline-offset: 2px; }
+.scq-opt:disabled { cursor: default; }
+.scq-opt.correct { background: var(--green-5); box-shadow: inset 0 0 0 1.5px var(--green-80); }
+.scq-opt.wrong   { background: var(--red-5);   box-shadow: inset 0 0 0 1.5px var(--red-100); }
+/* Radio — "questions icons" 22px: ring / filled; correct + incorrect = component exports. */
+.scq-radio { flex: 0 0 22px; width: 22px; height: 22px; border-radius: 50%; box-shadow: inset 0 0 0 2px var(--subject-500); }
+.scq-opt.selected .scq-radio { background: var(--subject-500); }
+.scq-opt.correct .scq-radio { box-shadow: none; background: url('../assets/img/answer-radio-correct.svg') center / 22px 22px no-repeat; }
+.scq-opt.wrong .scq-radio   { box-shadow: none; background: url('../assets/img/answer-radio-incorrect.svg') center / 22px 22px no-repeat; }
+
+/* ===== Hint — Figma "Hint Card" (4946:39533), over the shared popup backdrop =====
+   Subject/500 card, radius 48, padding 40, 24px gaps; text frame 462 wide with the
+   white 40px bulb at its right, then the hint in Body/B-4 (24 Regular, white,
+   trimmed); white 196 x 50 pill "חזרה לשאלה" (24 Regular #303030 -> Bold on hover).
+   Centred on the canvas. No title (new lomdot, 2026-10-05). */
+.scq-hint-overlay {
+  position: absolute; inset: 0; z-index: 35;
+  background: rgba(255, 255, 255, 0.8);
+  display: flex; align-items: center; justify-content: center;
+}
+.hint-card {
+  display: flex; flex-direction: column; align-items: center; gap: 24px;
+  padding: 40px; border-radius: 48px; background: var(--subject-500);
+  direction: rtl;
+}
+.hint-card__text { width: 462px; display: flex; flex-direction: column; align-items: flex-start; gap: 24px; }
+.hint-card__ico { width: 40px; height: 34.29px; color: #fff; }
+.hint-card__body { margin: 0; width: 100%; font: 400 24px/normal Calibri, Carlito, Arial, sans-serif; color: #fff; text-align: right; text-box: trim-both cap alphabetic; }
+/* Fixed 196 x 50 (Figma). The Bold hover label (~122px) is wider than the 116px
+   the Figma 40px side padding leaves, so the label is centred in the full width
+   instead of the padded box, never wraps, and reserves its Bold width (nav-label
+   ::before) — hover changes the weight only, never the footprint or line count. */
+.hint-card__close {
+  width: 196px; height: 50px; padding: 0; box-sizing: border-box;
+  display: flex; align-items: center; justify-content: center;
+  border: none; border-radius: 1000px; background: #fff;
+  font: 400 24px Calibri, Carlito, Arial, sans-serif; color: var(--black-100); cursor: pointer;
+  white-space: nowrap;
+}
+.hint-card__close:hover { font-weight: 700; }
+.hint-card__close .nav-label::before { font-weight: 700; }
+.hint-card__close:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+
+/* ===== Image Zoom — 720-templates _global-components "Image zoom" (as part 01) =====
+   Trigger = Figma "Zoom" (1589:17043): 44px circle, white, 2px inside Subject/500
+   stroke, magnifier from the component (inline SVG, currentColor); hover inverts. */
+.img-zoom-btn {
+  position: absolute; top: 10px; right: 10px; z-index: 3;
+  width: 44px; height: 44px; padding: 0;
+  border: none; border-radius: 100px;
+  background: #fff; box-shadow: inset 0 0 0 2px var(--subject-500);
+  color: var(--subject-500);
+  display: flex; align-items: center; justify-content: center; cursor: pointer;
+}
+.img-zoom-btn:hover { background: var(--subject-500); box-shadow: none; color: #fff; }
+.img-zoom-btn:focus-visible { outline: 2px solid var(--subject-700); outline-offset: 2px; }
+.img-zoom-btn__icon { display: block; width: 20.7149px; height: 20.9231px; }
+.img-zoom-modal { position: absolute; inset: 0; z-index: 40; display: flex; align-items: center; justify-content: center; }
+.img-zoom-modal__backdrop { position: absolute; inset: 0; background: rgba(255,255,255,.8); }
+/* Image Zoom Surface (Figma 4399:22435): hug the media ratio, 24/72 padding.
+   Close remains at (16,16), beside the media; outer radius 24, media radius 16. */
+.img-zoom-modal__panel { position: relative; padding: 24px 72px; background: #fff; border-radius: 24px; overflow: hidden; }
+.img-zoom-modal__stage { position: relative; border-radius: 16px; overflow: hidden; }
+.img-zoom-modal__close {
+  position: absolute; top: 16px; left: 16px; z-index: 2;
+  width: 40px; height: 40px; padding: 0;
+  border: none; border-radius: 100px;
+  background: #fff; box-shadow: inset 0 0 0 2px var(--subject-500);
+  color: var(--subject-500);
+  display: flex; align-items: center; justify-content: center; cursor: pointer;
+}
+.img-zoom-modal__close:hover { background: var(--subject-500); box-shadow: none; color: #fff; }
+.img-zoom-modal__close:focus-visible { outline: 2px solid var(--subject-700); outline-offset: 2px; }
+.img-zoom-modal__close-icon { display: block; width: 15px; height: 15px; }
+
+
+/* =====================================================================
+   methodica-gas-uses-01-01 additions (below this line). Everything above is
+   ported verbatim from methodica-science-mass-liquid-02-02/css/style.css
+   (720 chrome + TransitionScreen + Progress question + paragraph DnD +
+   popup + SCQ + hint + zoom).
+   ===================================================================== */
+
+/* Inline bold inside TransitionScreen copy (authored emphasis, slide 13). */
+.s1-subtitle strong { font-weight: 700; }
+/* Stack: when the media box has to shrink (slide 13's two long paragraphs), keep a
+   24px clearance (the B stack gap) between the last text line and the media box, so
+   the descenders of a trimmed line never touch it. No effect where the stack fits. */
+.s1-content--stack { gap: 24px; }
+
+/* ===== Development placeholders — a MISSING production asset, never shipped =====
+   Approved instruction 8 (2026-10-18): a missing media asset is shown as a
+   clearly marked placeholder only; no image or video is generated. data-placeholder
+   names the open question that owns the asset (docs/03-open-questions.md). */
+.ph {
+  display: flex; align-items: center; justify-content: center; text-align: center;
+  box-sizing: border-box; padding: 12px;
+  background: repeating-linear-gradient(45deg, #FFF7D6 0 12px, #FFF0B8 12px 24px);
+  border: 2px dashed #B98A00; border-radius: 16px;
+  font: 600 18px/1.35 Calibri, Carlito, Arial, sans-serif; color: #5C4600; direction: rtl;
+}
+.ph::before { content: 'PLACEHOLDER · ' attr(data-placeholder); position: absolute; margin-top: -1px; transform: translateY(calc(-50% - 2.2em)); font-size: 13px; font-weight: 700; letter-spacing: .02em; opacity: .75; }
+.ph--fill { width: 100%; height: 100%; position: relative; }
+.ph--media { width: 364px; height: 243px; position: relative; }
+.ph--fullbleed {
+  position: absolute; inset: 0 0 var(--bar-h) 0; border-radius: 0; z-index: 0;
+  align-items: flex-end; padding-bottom: 24px; opacity: .55;
+}
+.ph--fullbleed::before { transform: none; top: 12px; }
+.screen > .s1-content { z-index: 1; }
+
+/* S3 only: supplied cloud, spread behind the unchanged TransitionScreen B text.
+   Mask softens the source image's rectangular edge without altering the asset.
+   Decorative movement ends at 3s; the final composition stays visible. */
+#s3 .s3-gas {
+  position: absolute; inset: 0 0 var(--bar-h); overflow: hidden;
+  pointer-events: none; z-index: 0;
+}
+#s3 .s3-gas__cloud {
+  position: absolute; height: auto; max-width: none; pointer-events: none;
+  mix-blend-mode: multiply;
+  mask-image: radial-gradient(ellipse closest-side, #000 55%, transparent 98%);
+  -webkit-mask-image: radial-gradient(ellipse closest-side, #000 55%, transparent 98%);
+  transform: translate(var(--gas-x), var(--gas-y)) scale(var(--gas-scale));
+  opacity: var(--gas-opacity);
+}
+#s3 .s3-gas__cloud--main {
+  width: 1050px; left: -150px; top: 90px;
+  --gas-x: 65px; --gas-y: -30px; --gas-scale: 1.2; --gas-opacity: .6;
+}
+#s3 .s3-gas__cloud--upper {
+  width: 880px; left: 440px; top: -130px;
+  --gas-x: -30px; --gas-y: 30px; --gas-scale: 1.15; --gas-opacity: .24;
+}
+#s3 .s3-gas__cloud--right {
+  width: 850px; left: 600px; top: 230px;
+  --gas-x: -65px; --gas-y: -25px; --gas-scale: 1.2; --gas-opacity: .38;
+}
+#s3.active .s3-gas__cloud { animation: s3-gas-spread 3s ease-out both; }
+@keyframes s3-gas-spread {
+  from { opacity: 0; transform: translate(0, 45px) scale(.55); }
+  to {
+    opacity: var(--gas-opacity);
+    transform: translate(var(--gas-x), var(--gas-y)) scale(var(--gas-scale));
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  #s3.active .s3-gas__cloud { animation: none; }
+}
+
+/* S12 + S13 only: the S3 cloud asset as large frameless media in the free left area,
+   floating up and down without end (Noa 2026-10-25; stands in for the S-04 clip).
+   Out of the flow, so the question / DnD layout is unchanged. The reveal fade sits on
+   the wrapper and the float transform on the <img>, so the two never share a transform.
+   Decorative: no pointer events, hidden from assistive tech. */
+.gas-float {
+  position: absolute; top: calc(50% - 355px + var(--gas-top)); left: calc(50% - 640px + var(--gas-left));
+  width: var(--gas-w); pointer-events: none; z-index: 0;
+}
+.gas-float--s12 { --gas-left: 80px; --gas-top: 110px; --gas-w: 720px; }
+.gas-float--s13 { --gas-left: 10px; --gas-top: 150px; --gas-w: 500px; }
+.gas-float__cloud {
+  display: block; width: 100%; height: auto; pointer-events: none;
+  mix-blend-mode: multiply;
+  mask-image: radial-gradient(ellipse closest-side, #000 55%, transparent 98%);
+  -webkit-mask-image: radial-gradient(ellipse closest-side, #000 55%, transparent 98%);
+}
+.screen.active .gas-float__cloud { animation: gas-float 5s ease-in-out infinite alternate; }
+@keyframes gas-float {
+  from { transform: translate(-6px, 14px) rotate(-1deg); }
+  to { transform: translate(6px, -14px) rotate(1deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .screen.active .gas-float__cloud { animation: none; }
+}
+
+
+/* ===== Development stub for a screen that is not built yet (blocked) ===== */
+.dev-blocked {
+  position: absolute; left: 50%; top: calc(50% - 355px + 230px); transform: translateX(-50%);
+  width: 720px; box-sizing: border-box; padding: 32px 40px;
+  border: 2px dashed #B98A00; border-radius: 24px; background: #FFFBEA;
+  direction: rtl; text-align: right; color: #3D2F00;
+}
+.dev-blocked p { margin: 0; }
+.dev-blocked__tag { font: 700 14px Calibri, Carlito, Arial, sans-serif; letter-spacing: .04em; color: #8A6700; margin-bottom: 8px !important; }
+.dev-blocked__title { font: 700 26px Calibri, Carlito, Arial, sans-serif; margin-bottom: 12px !important; }
+.dev-blocked__body { font: 400 20px/1.4 Calibri, Carlito, Arial, sans-serif; }
+
+/* ===== TextWithCallout, media=image (S0, slide 3) =====
+   Figma "Screen Templates/TextWithCallout" 982:17031: Section Title Headings/H-6 (40 Bold,
+   Natural/800), centred in a 1050 max-width box at y 64 (30 tall, cap-trimmed); 56 below it
+   the content row, x 40-1240: text column 790 at the right (Body/B-4 24 Regular +
+   Body/B-6 24 Bold, right-aligned, 16 between the two blocks) + 56 + image column 304.
+   Slide 3 adaptation (Q-19): no Speech Bubble, image column top-aligned with the text.
+   The image reuses the shared content-image card (.scq-img: 8px padding + hairline, frame
+   hugs the picture's ratio) with the template's 304 box as the maximum. */
+.twc-title {
+  position: absolute; top: calc(50% - 355px + 64px); left: calc(50% - 525px); width: 1050px;
+  margin: 0; text-align: center; direction: rtl; color: var(--black-100);
+  font: 700 40px/normal Calibri, Carlito, Arial, sans-serif; text-box: trim-both cap alphabetic;
+}
+.twc-row {
+  position: absolute; top: calc(50% - 355px + 150px); left: calc(50% - 640px + 40px); width: 1200px;
+  display: flex; align-items: flex-start; gap: 56px; direction: rtl;
+}
+.twc-text { width: 790px; flex: 0 0 790px; display: flex; flex-direction: column; gap: 16px; color: var(--black-100); text-align: right; }
+.twc-text p { margin: 0; font: 400 22px/normal Calibri, Carlito, Arial, sans-serif; text-box: trim-both cap alphabetic; }
+.twc-text .twc-text__bold { font-weight: 700; }
+.twc-img { max-width: 304px; max-height: 304px; }
+.twc-img .scq-img-inner > img { max-width: 288px; max-height: 288px; }
+/* S0 only — Q-36 option B (Noa 2026-10-19): approved local enlargement for slide 3, where
+   the picture is ~41% of the slide width. Picture 520x390 (its own 4:3), card 536x406 at
+   x 40-576, y 150-556 (80 above the bar at 636). The card leaves the flex flow and sits at
+   the row's left edge, so the text column keeps its x 450-1240 box and line breaks; the
+   text lines end well right of x 576. Temporary until the diver video exists (S-04).
+   The shared TextWithCallout rules above are unchanged. */
+/* S0 local alignment approved 2026-10-22: match the visible image inside its 8px card padding. */
+#s0 .twc-text { padding-top: 8px; }
+#s0 .twc-img { position: absolute; top: 0; left: 0; max-width: 536px; max-height: 406px; }
+#s0 .twc-img .scq-img-inner > img { max-width: 520px; max-height: 390px; }
+/* The clip is 16:9 while the card is the approved 520x390: cover, centred crop (the diver is centred). */
+#s0 .twc-img .scq-img-inner > video { display: block; width: 520px; height: 390px; object-fit: cover; pointer-events: none; }
+/* S0-only decorative exhalation: SVG coordinates follow the image at every scale.
+   Each bubble ends after 3s; last delay + entrance delay keeps the sequence below 5s.
+   Child transforms are independent of the card's existing fade-only entrance. */
+.s0-bubbles { position: absolute; inset: 0; width: 100%; height: 100%; overflow: hidden; pointer-events: none; }
+.s0-bubbles circle { fill: rgba(255,255,255,.12); stroke: rgba(255,255,255,.7); stroke-width: .9; opacity: 0; }
+#s0.active .s0-bubbles circle { animation: s0-bubble-rise 3s linear calc(.36s + var(--bubble-delay)) both; }
+@keyframes s0-bubble-rise {
+  0% { opacity: 0; transform: translate(0, 0); }
+  12% { opacity: .7; }
+  72% { opacity: .45; }
+  100% { opacity: 0; transform: translate(var(--bubble-drift), -85px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  #s0.active .s0-bubbles circle { animation: none; }
+}
+
+
+/* ===== SCQ + applet (S4 slide 8, S5 slide 9) =====
+   The applet zone takes the SCQ media column (380 x 380, x 40-420, y 139-519; Q-37: kept for
+   now, to be reviewed now that the applets exist). Figma has no applet frame. Labels = the
+   slides' text boxes (16.5pt = 22px, centred, Natural/800).
+   The production pictures are opaque with a 254 background (no alpha): each picture layer is
+   multiplied onto the page and lifted by brightness(1.012), so the 254 box is pure white and
+   invisible, and glass over gas reads as glass, not as a white card. */
+.applet-zone { position: relative; flex: 0 0 380px; width: 380px; height: 380px; direction: ltr; }
+.applet-zone img { display: block; }
+.applet-label {
+  position: absolute; display: flex; align-items: center; justify-content: center;
+  margin: 0; font: 400 22px/1 Calibri, Carlito, Arial, sans-serif; color: var(--black-100); text-align: center; direction: rtl;
+}
+.applet-label--bold { font-weight: 700; }
+/* Applet secondary button = the shared ShowAnswer pill (.popup-action, Figma 196:6020 neutral). */
+.applet-btn {
+  position: absolute; display: inline-flex; align-items: center; justify-content: center; white-space: nowrap;
+  height: 39px; padding: 0 20px; border-radius: 1000px; box-sizing: border-box;
+  background: #fff; color: #222; border: 1px solid #484848;
+  font: 400 20px Calibri, Carlito, Arial, sans-serif; cursor: pointer; z-index: 4;
+}
+.applet-btn:hover { font-weight: 600; }
+.applet-btn:focus-visible { outline: 2px solid var(--subject-700); outline-offset: 2px; }
+
+/* ----- S4 "גז בכלים" (slide 8). Arrangement = slide 8 scaled into the box: cloud top-left,
+   cup / tube / bottle bottom-aligned below at the slide's centres. Open vessels ("כוס.png",
+   "מבחנה.png", "בקבוק.png"); each vessel has its own scale (--s, screen px per file px), so the
+   three read at the slide's relative sizes (the open files are not on one common scale).
+   Layers per vessel: gas (SVG, clipped to the vessel's interior, traced from the picture) ->
+   glass (multiply) -> lid = a crop of the lidded production file ("... מכסה.png"), scaled to the
+   open rim; opaque caps get a white under-plate so the open neck does not show through.
+   The gas texture is the gas of the slide-9 picture ("דחיסתגז.png"). */
+.s4-vessel { position: absolute; mix-blend-mode: multiply; filter: brightness(1.012); }
+.s4-gas, .s4-glass { position: absolute; left: 0; top: 0; width: 100%; height: 100%; }
+.s4-glass { mix-blend-mode: multiply; }
+.s4-gas-body { opacity: 0; }
+.s4-spread { transform-box: fill-box; transform-origin: center; }
+.s4-vessel[data-state="full"] .s4-gas-body { opacity: 1; }
+.s4-lid { position: absolute; opacity: 0; transform: translateY(calc(var(--s) * -24px)); pointer-events: none; }
+.s4-vessel[data-state="full"] .s4-lid { opacity: 1; transform: none; }
+.s4-lid-crop { position: absolute; inset: 0; overflow: hidden; mix-blend-mode: multiply; }
+.s4-lid-crop img { position: absolute; max-width: none; }
+.s4-lid-under { position: absolute; background: #fff; border-radius: calc(var(--s) * 4px); }
+.s4-vessel--cup .s4-lid { left: calc(var(--s) * 9.79px); top: calc(var(--s) * 12.95px); width: calc(var(--s) * 167.4px); height: calc(var(--s) * 33.3px); }
+.s4-vessel--cup .s4-lid-crop img { width: calc(var(--s) * 219.2px); left: calc(var(--s) * -24.05px); top: calc(var(--s) * -68.45px); }
+.s4-vessel--tube .s4-lid { left: calc(var(--s) * 82.05px); top: calc(var(--s) * 3.85px); width: calc(var(--s) * 67.05px); height: calc(var(--s) * 42.77px); }
+.s4-vessel--tube .s4-lid-crop img { width: calc(var(--s) * 153.75px); left: calc(var(--s) * -27.74px); top: calc(var(--s) * -54.33px); }
+.s4-vessel--tube .s4-lid-under { left: calc(var(--s) * 6px); top: calc(var(--s) * 4px); width: calc(var(--s) * 55.05px); height: calc(var(--s) * 32.77px); }
+.s4-vessel--bottle .s4-lid { left: calc(var(--s) * 76.94px); top: calc(var(--s) * 12.98px); width: calc(var(--s) * 64.98px); height: calc(var(--s) * 49.59px); }
+.s4-vessel--bottle .s4-lid-crop img { width: calc(var(--s) * 185.5px); left: calc(var(--s) * -51.3px); top: calc(var(--s) * -18.81px); }
+.s4-vessel--bottle .s4-lid-under { left: calc(var(--s) * 6px); top: calc(var(--s) * 4px); width: calc(var(--s) * 52.98px); height: calc(var(--s) * 39.59px); }
+/* Hit / focus target = the vessel's visible box (+6 file px). Empty: a drop target (Enter fills
+   it from the keyboard); full vessels stay closed until reset. */
+.s4-vessel-hit { position: absolute; padding: 0; border: none; background: transparent; border-radius: 12px; cursor: default; }
+.s4-vessel-hit:focus-visible { outline: 2px solid var(--subject-700); outline-offset: 2px; }
+.s4-vessel--cup .s4-vessel-hit { left: calc(var(--s) * 13px); top: calc(var(--s) * 6px); width: calc(var(--s) * 161px); height: calc(var(--s) * 237px); }
+.s4-vessel--tube .s4-vessel-hit { left: calc(var(--s) * 76px); top: calc(var(--s) * 0px); width: calc(var(--s) * 78px); height: calc(var(--s) * 326px); }
+.s4-vessel--bottle .s4-vessel-hit { left: calc(var(--s) * 53px); top: calc(var(--s) * 8px); width: calc(var(--s) * 112px); height: calc(var(--s) * 297px); }
+/* Dashed subject-blue outline follows each vessel, on hover, drop preview and focus. */
+.s4-hover-outline { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; opacity: 0; }
+.s4-hover-outline path { fill: none; stroke: var(--subject-500); stroke-width: 2; stroke-dasharray: 6 4; vector-effect: non-scaling-stroke; }
+.s4-vessel[data-state="empty"]:hover .s4-hover-outline,
+.s4-vessel.is-over .s4-hover-outline,
+.s4-vessel:has(.s4-vessel-hit:focus-visible) .s4-hover-outline { opacity: 1; }
+/* Cloud centred over the vessel group (hit boxes x 29-341, centre 185; Noa 2026-11-03). */
+.s4-cloud {
+  position: absolute; left: 69px; top: -8px; width: 232px; height: 155px; z-index: 3;
+  mix-blend-mode: multiply; filter: brightness(1.012);
+  cursor: grab; touch-action: none; user-select: none;
+}
+.s4-cloud.is-dragging { cursor: grabbing; }
+.s4-cloud img { width: 232px; height: 155px; pointer-events: none; }
+.s4-cloud .applet-label { inset: 0; pointer-events: none; color: #000; }
+/* "איפוס" centred under the vessel group, 12px below the hit boxes (Noa 2026-11-03). Disabled
+   while there is nothing to reset = the disabled "צדקתי?" look (--gray-100). */
+.s4-reset { left: 185px; top: 410px; translate: -50% 0; border-color: var(--subject-700); color: var(--subject-700); }
+.s4-reset:disabled { background: var(--gray-100); border-color: var(--gray-100); color: var(--black-100); cursor: not-allowed; }
+.s4-reset:disabled:hover { font-weight: 400; }
+/* S4 gesture hints (Noa 2026-11-03; 720-templates _gesture-hints.md, finite two-cycle).
+   Drag: the S7 Figma hand (gh-cursor-click.svg, fingertip at 10,1) travels from the cloud to
+   the tube's mouth by a left/top transition; it fades out in place and returns unseen.
+   Stops after two demonstrations, or immediately on real interaction. */
+.s4gh { position: absolute; width: 0; height: 0; pointer-events: none; z-index: 5; opacity: 0; transition: opacity .3s ease-out; }
+.s4gh.hidden { display: none; }
+.s4gh.is-shown { opacity: 1; }
+.s4gh.is-moving { transition: opacity .3s ease-out, left 1.2s ease-in-out, top 1.2s ease-in-out; }
+.s4gh-hand { position: absolute; left: -10px; top: -1px; display: block; width: 28px; height: 33px; }
+@media (prefers-reduced-motion: reduce) { .s4gh { display: none !important; } }
+
+/* ----- S5 "דחיסת גז" (slide 9). The picture stays the base (glass, rims, bottoms); an SVG in
+   the picture's own pixels (viewBox 492 x 328) replaces what moves: it erases the baked piston
+   and contents, then redraws the contents, the scale and the piston. Scale = the picture's:
+   long tick every 10 mL from 100 (y 73) to 10 (y 265), short tick every 5 -> 2.1333 px per mL;
+   0 mL = y 286. Piston = the picture's: an elliptical plate (top face + black front band), a
+   rod with soft edges, a rounded handle disc. Where the baked plate hid the glass walls (rows
+   131-155), the walls are patched from the rows just above them (the walls are vertical). Contents = the picture's own gas / liquid pixels, cropped right of the scale and
+   stretched into the space under the plate, so the gas squeezes (denser) as the piston goes down.
+   The slide crops the picture in two and shows the gas vessel on the right (scale 0.7927). */
+.s5-vessel { position: absolute; top: 80px; height: 260px; overflow: hidden; mix-blend-mode: multiply; filter: brightness(1.012); }
+.s5-art { position: relative; width: 390px; height: 260px; }
+.s5-art img, .s5-svg { position: absolute; left: 0; top: 0; width: 390px; height: 260px; max-width: none; }
+.s5-svg { overflow: visible; }
+.s5-vessel--gas { left: 180px; width: 193px; }
+.s5-vessel--liquid { left: 8px; width: 201px; }
+.s5-vessel--liquid .s5-art { margin-left: -189px; }
+.s5-erase { fill: rgb(254, 254, 254); }
+.s5-erase--in { fill: rgb(252, 252, 252); }
+.s5-rim { stroke: rgb(198, 198, 199); stroke-width: 1.6; }
+.s5-tick { stroke: #706f75; stroke-width: 1; }
+.s5-tick--minor { stroke: #8c8b91; stroke-width: .9; }
+.s5-num { font: 400 11px Arial, Helvetica, sans-serif; fill: #5b5a60; }
+.s5-dense { fill: rgb(140, 90, 210); opacity: 0; }
+/* Liquid vessel only: the picture's liquid is purple; shown blue (request 2026-11-11, CSS-only,
+   gas vessel unchanged). */
+.s5-vessel--liquid .s5-fill { filter: hue-rotate(-50deg); }
+.s5-plate-top { fill: #232325; }
+.s5-plate { fill: #060607; }
+.s5-collar { fill: #0b0b0b; }
+.s5-handle { cursor: grab; outline: none; touch-action: none; }
+.s5-handle.is-dragging { cursor: grabbing; }
+.s5-handle-hit { fill: transparent; }
+.s5-handle-focus { fill: none; stroke: var(--subject-700); stroke-width: 2; opacity: 0; }
+.s5-handle:focus-visible .s5-handle-focus { opacity: 1; }
+/* Note: "הידיות השחורות יהבהבו בעדינות עד שהתלמיד מזיז אותן" - each handle stops on its own first move. */
+.s5-handle.is-hint .s5-handle-grip { animation: s5-blink 1.6s ease-in-out infinite; }
+@keyframes s5-blink { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
+@media (prefers-reduced-motion: reduce) {
+  .s5-handle.is-hint .s5-handle-grip { animation: none; }
+  .s5-handle.is-hint .s5-handle-focus { opacity: .8; }
+}
+/* "דחפו מטה" = plain label with a down arrow left of the text, at the slide's connector
+   ("מחבר חץ ישר 13", x 179). Q-40 revised (Noa 2026-11-03): the dashed outline is gone - it read
+   as a button / drop zone - and the arrow is the Figma Navigation Icons blue line arrow
+   (5359:35480, 52.75 x 40, Subject/500), turned to point down and scaled to 26 x 34.
+   Static - the arrow is not animated. */
+.s5-push { left: 105px; top: 10px; width: 201px; height: 51px; box-sizing: border-box; }
+.s5-push-arrow { position: absolute; left: 132px; top: 18px; width: 26px; height: 34px; color: var(--subject-500); }
+.s5-cap { top: 334px; height: 36px; }
+.s5-cap--gas, .s5-read--gas { left: 234px; width: 115px; }
+.s5-cap--liquid, .s5-read--liquid { left: 28px; width: 138px; }
+/* Live mL reading (approved 2026-10-19), under each label. */
+.s5-read { top: 368px; height: 26px; font-size: 20px; font-weight: 700; }
+/* S4 / S5 feedback popup — template default position (x 0, 426 wide, bottom on the bar);
+   Q-38 reopened (Noa 2026-10-25): the 2026-10-19 override under the text column was removed.
+   Q-39: the slides' empty paragraph before "מסקנה:" = one blank line. */
+#s4-popup .scq-popup-body p + p, #s5-popup .scq-popup-body p + p { margin-top: 1.3em; margin-top: 1lh; }
+
+/* ===== HookOpenQuestion — LOCAL VARIANT (S1, slide 4) =====
+   720-templates HookOpenQuestion.md + Figma "Open Answer Component" (730:10484):
+   449 wide; text -> 16px -> Text Input States (449 x 151) -> 24px -> inner nav button.
+   Row = the shared .scq-question geometry (top 139, 40px sides). Text column on the
+   right (first in DOM, rtl), image column on the left. */
+.hoq-question { justify-content: space-between; }
+.hoq-main { width: 449px; flex: 0 0 449px; display: flex; flex-direction: column; align-items: flex-start; }
+.hoq-stem { margin: 0 0 16px; font: 700 22px/normal Calibri, Carlito, Arial, sans-serif; color: var(--black-100); text-align: right; text-box: trim-both cap alphabetic; }
+.oq-textarea {
+  width: 449px; height: 151px; box-sizing: border-box; padding: 16px;
+  background: #fff; border: 1.5px solid var(--natural-300); border-radius: 10px;
+  font: 400 20px/normal Calibri, Carlito, Arial, sans-serif; color: var(--text); direction: rtl; text-align: right;
+  resize: none; outline: none;
+}
+.oq-textarea::placeholder { color: #8A8A8A; }
+.oq-textarea:focus { border-color: var(--subject-500); }
+.btn-continue:focus-visible, .btn-back:focus-visible { outline: 2px solid var(--subject-700); outline-offset: 2px; }
+/* Figma "character" group (730:10486): horizontal, gap 12 — bubble (235) at x 0, the
+   167 x 165 character at x 247, i.e. the character on the RIGHT with the beak pointing
+   at it; the group hugs the column's right edge. DOM order is bubble, character, so the
+   row is reversed under RTL. */
+.hoq-character { display: flex; flex-direction: row-reverse; align-items: flex-start; gap: 12px; margin-top: 24px; align-self: stretch; justify-content: flex-end; }
+.hoq-character[hidden] { display: none; }
+.hoq-character__img { flex: 0 0 167px; width: 167px; height: 165px; font-size: 15px; }
+/* S1 companion clip (1080x1920, white ground) fitted whole into the 167x165 Figma box. */
+.hoq-character__video { display: block; width: 100%; height: 100%; object-fit: contain; pointer-events: none; }
+/* S1 local (Noa 2026-10-26): the portrait clip read tiny in 167x165; the box grows to 260 tall,
+   width unchanged, ~20px clear of the bar. */
+#s1 .hoq-character__img { height: 260px; }
+.hoq-bubble {
+  position: relative; flex: 0 0 auto; max-width: 235px; box-sizing: border-box; padding: 12px 16px;
+  background: #fff; border: 3px solid var(--subject-500); border-radius: 12px; margin-top: 16px;
+}
+.hoq-bubble p { margin: 0; font: 400 20px/24px Calibri, Carlito, Arial, sans-serif; color: #000; text-align: right; }
+/* S1: white base masks the border; the two blue edges join the bubble outline.
+   Direct right-facing geometry avoids rotation offsets at different canvas scales. */
+.hoq-bubble__beak { position: absolute; top: calc(50% - 13px); right: -17px; width: 18px; height: 26px; overflow: visible; pointer-events: none; color: var(--subject-500); }
+/* S1 only — Q-35 reopened (Noa 2026-10-24): local enlargement of the image card from the
+   template 380 to 480 x 480 (picture 464, file 640). Row top 139 -> card bottom 619, 17 above
+   the bar at 636. The shared .scq-img rules are unchanged. */
+#s1 .scq-img { max-width: 480px; max-height: 480px; }
+#s1 .scq-img-inner > img { max-width: 464px; max-height: 464px; }
+/* Same 16:9 clip as S0 and the S7 card, centre-cropped into the square card. */
+#s1 .scq-img-inner > video { display: block; width: 464px; height: 464px; object-fit: cover; pointer-events: none; }
+/* S1-only decorative exhalation (Noa 2026-10-24), same pattern as .s0-bubbles: bubbles rise
+   from the diver's regulator along the photo's own trail. Image entrance delay (180ms) +
+   last delay + 3s keeps the sequence below 5s. */
+.s1-bubbles { position: absolute; inset: 0; width: 100%; height: 100%; overflow: hidden; pointer-events: none; }
+.s1-bubbles circle { fill: rgba(255,255,255,.12); stroke: rgba(255,255,255,.7); stroke-width: 1.1; opacity: 0; }
+#s1.active .s1-bubbles circle { animation: s1-bubble-rise 3s linear calc(.18s + var(--bubble-delay)) both; }
+@keyframes s1-bubble-rise {
+  0% { opacity: 0; transform: translate(0, 0); }
+  12% { opacity: .75; }
+  72% { opacity: .45; }
+  100% { opacity: 0; transform: translate(var(--bubble-drift), -190px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  #s1.active .s1-bubbles circle { animation: none; }
+}
+
+/* ===== DragAndDropQuestion — Image Top layout (S6, slide 10) =====
+   Ported from methodica-science-mass-liquid-02-01 S7 (Figma ImageTopDragAndDropQuestion
+   5340:25539: content x 95.5 / top 131 / 1089 wide / gap 30; head "text" frame; columns
+   = Image Frame + Drag&Drop State 10px apart, gap 75; Draggables row 110 tall).
+   Deltas (see the markup): three columns, pictures contained.
+   Q-32 reopened (Noa 2026-10-25), S6 only: board and bank back to the Figma geometry - columns
+   280 wide, 75px gaps, centred in the frame (x 145-1135). The feedback popup stays at its default
+   (x 0-426, on the bar) and may cover the left column; it can be dragged. The bank stays under
+   the board (ImageTop structure). */
+.itd-content {
+  position: absolute; left: calc(50% - 640px + 95.5px); width: 1089px;
+  top: calc(50% - 355px + 131px);
+  display: flex; flex-direction: column; align-items: center; gap: 30px;
+  --itd-col-w: 280px; --itd-gap: 75px;
+}
+.itd-head { width: 100%; min-height: 44px; padding: 0 10px; box-sizing: border-box; display: flex; flex-direction: column; gap: 16px; }
+.itd-title { margin: 0; font: 700 22px/normal Calibri, Carlito, Arial, sans-serif; color: var(--subject-500); text-align: right; text-box: trim-both cap alphabetic; }
+.itd-text { margin: 0; font: 400 22px/normal Calibri, Carlito, Arial, sans-serif; color: var(--black-100); text-align: right; text-box: trim-both cap alphabetic; }
+.itd-text strong { font-weight: 700; }
+.itd-targets { display: flex; gap: var(--itd-gap); }
+.itd-col { width: var(--itd-col-w); display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.itd-frame {
+  position: relative; width: var(--itd-col-w); height: 216px; box-sizing: border-box;
+  background: #fff; border: 3px solid rgba(201, 206, 216, 0.4); border-radius: 16px; overflow: hidden;
+}
+.itd-img { position: absolute; inset: 8px; width: calc(100% - 16px); height: calc(100% - 16px); object-fit: contain; pointer-events: none; }
+.itd-frame .ph { border-radius: 13px; border-width: 0; }
+.itd-zone {
+  width: var(--itd-col-w); height: 66px; box-sizing: border-box; border-radius: 12px;
+  background: var(--natural-200); border: 1px dashed rgba(0, 0, 0, 0.6);
+  display: flex; align-items: center; gap: 10px; padding: 0 16px; direction: rtl;
+  cursor: default; outline: none;
+}
+.itd-zone.drag-over { background: #fff; border: 1px dashed var(--subject-500); }
+.itd-zone.occupied { background: var(--subject-100); border: 1.5px solid var(--subject-500); }
+.itd-zone.correct, .itd-zone.wrong { height: 76px; margin-bottom: -10px; padding: 12px 12px; background: #fff; }
+.itd-zone.correct { border: 1.5px solid var(--green-80); }
+.itd-zone.wrong { border: 1.5px solid var(--red-100); }
+.itd-zone:focus-visible { box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--subject-500); }
+.itd-mark { flex: 0 0 26px; width: 26px; height: 26px; background: center / 26px 26px no-repeat; }
+.itd-zone.correct .itd-mark { background-image: url('../assets/img/answer-radio-correct.svg'); }
+.itd-zone.wrong .itd-mark { background-image: url('../assets/img/answer-radio-incorrect.svg'); }
+.itd-placed {
+  flex: 1 1 auto; min-width: 0; height: 100%; display: flex; align-items: center;
+  font: 400 22px/normal Calibri, Carlito, Arial, sans-serif; color: var(--black-100); direction: rtl; text-align: right;
+  cursor: grab; touch-action: none; user-select: none;
+}
+.itd-zone.locked .itd-placed { cursor: default; }
+.itd-bank { width: calc(3 * var(--itd-col-w) + 2 * var(--itd-gap)); height: 110px; display: flex; justify-content: space-between; align-items: center; }
+.itd-slot { width: var(--itd-col-w); height: 66px; }
+.itd-label { display: block; line-height: 1.2; }
+.itd-chip {
+  width: var(--itd-col-w); height: 66px; box-sizing: border-box; margin: 0; padding: 0 16px;
+  background: #fff; border: 1.5px solid var(--natural-300); border-radius: 10px;
+  font: 400 22px/normal Calibri, Carlito, Arial, sans-serif; color: var(--black-100);
+  direction: rtl; text-align: right;
+  display: flex; align-items: center; cursor: grab; touch-action: none; user-select: none;
+}
+.itd-chip.is-selected, .itd-chip.dragging, .itd-chip.pointer-drag-ghost,
+.itd-placed.pointer-drag-ghost { border: 1.5px solid var(--subject-500); }
+.itd-placed.pointer-drag-ghost { background: #fff; border-radius: 10px; padding: 0 16px; box-sizing: border-box; width: var(--itd-col-w, 280px); }
+.itd-chip.is-placed { visibility: hidden; }
+.itd-chip:focus-visible { outline: 2px solid var(--subject-500); outline-offset: 2px; }
+.itd-chip.is-placed:focus-visible { outline: none; }
+#s6-popup .scq-popup-actions { justify-content: flex-start; }
+/* S9 feedback: "טכנולוגי." ended alone on a line; screen-scoped, the shared popup is untouched (QA 2026-10-19). */
+#s9-popup .scq-popup-body p { text-wrap: pretty; }
+/* S12 feedback: "לדחיסה." ended alone on a line at 426; screen-scoped widening (fits from 427, slack kept)
+   so it joins the line above; position, drag and the shared popup are untouched (Noa, 2026-11-03). */
+#s12-popup { width: 440px; }
+
+/* ===== Categorisation DnD, two bins, text chips (S9, slide 14) =====
+   Local variant ported from methodica-science-mass-liquid-02-02 S6 (bins: Drop Zone
+   Default / Hover / Dropped of Drag&Drop State 1249:32691) with that lomda's S1 text
+   chips (.ddqp-chip). Column from the row top (131): head, 24, the two boxes (each with
+   the slide's picture + bold name + line above it), 24, the six-chip bank (3 x 2). Chips
+   placed in a box stack one per row. */
+.ddc-main {
+  position: absolute; top: calc(50% - 355px + 131px); left: calc(50% - 640px + 40px); width: 1200px;
+  display: flex; flex-direction: column; gap: 24px; direction: rtl;
+  --ddqp-pill-w: 368px;
+}
+.ddc-head { display: flex; flex-direction: column; gap: 16px; }
+.ddc-bins { display: flex; gap: 24px; direction: rtl; width: 100%; }
+.ddc-bin-col { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: 12px; }
+.ddc-bin-head { display: flex; align-items: center; gap: 16px; direction: rtl; height: 64px; }
+.ddc-bin-head__img { flex: 0 0 80px; width: 80px; height: 64px; object-fit: contain; }
+.ddc-bin-head__text { margin: 0; font: 400 20px/24px Calibri, Carlito, Arial, sans-serif; color: var(--black-100); text-align: right; }
+.ddc-bin-head__text strong { font-weight: 700; }
+.ddc-bin {
+  box-sizing: border-box; padding: 12px; border-radius: 12px; min-height: 166px;
+  background: var(--natural-200); border: 1px dashed rgba(0, 0, 0, 0.6);
+  display: flex; flex-direction: column; outline: none; cursor: default;
+}
+.ddc-bin.drag-over { background: #fff; border: 1px dashed var(--subject-500); }
+.ddc-bin.occupied { background: #fff; border: 1.5px solid var(--subject-500); }
+.ddc-bin:focus-visible { box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--subject-500); }
+.ddc-bin__cards { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; direction: rtl; }
+.ddc-bank { display: flex; flex-wrap: wrap; gap: 16px 24px; justify-content: flex-start; width: 100%; }
+.ddc-slot { width: var(--ddqp-pill-w); height: 42px; }
+/* A placed chip = the same pill (span) inside the box; verdict = 1.5px green / red border + the 26px mark. */
+.ddc-chip { position: relative; gap: 10px; }
+.ddc-chip.ddc-chip--placed { display: flex; }
+.ddc-chip.locked { cursor: default; }
+.ddc-chip.correct { border: 1.5px solid var(--green-80); }
+.ddc-chip.wrong { border: 1.5px solid var(--red-100); }
+.ddc-chip .ddqp-mark { order: -1; }
+.ddc-chip.correct .ddqp-mark { background-image: url('../assets/img/answer-radio-correct.svg'); }
+.ddc-chip.wrong .ddqp-mark { background-image: url('../assets/img/answer-radio-incorrect.svg'); }
+.ddc-chip.correct, .ddc-chip.wrong { padding-right: 10px; }
+/* Q-32, alternative A (producer-approved, Noa 2026-10-19). The feedback popup stays at its default
+   (x 0-426, on the bar); the board moves clear of it. The two boxes stay side by side (as slide 14),
+   right-aligned in x 442-1240, 387 wide each; the bank of six chips becomes a column on the left,
+   in the strip the popup opens over only once every chip has been placed. Box heads share one height,
+   so both boxes start on the same line; placed chips fill the box width and may wrap to two lines (as
+   on the slide). Each box reserves the height of the solved box with its marks (233: three chips, two
+   of them wrapped once marked), so neither box grows while the learner sorts or when the answer is
+   checked and shown.
+   One-line labels (S9 reopened, alternative A, Noa 2026-10-25): marked chips no longer wrap. The boxes
+   widen left to x 428 (812 for both, 8 between them, 402 each), the box keeps 6px side padding, a marked
+   chip has 10px on both sides and 8px beside its mark - 331px for text, the longest label is 324. The
+   bank narrows to 370 (x 40-410, chips 368). Font size unchanged.
+   Crowded box (4-6 chips, Q-32 edge-case fix, Noa 2026-10-19): no inner scroll and nothing under the
+   bar - the box packs tighter instead: 8px box padding, 4px between chips, 4px chip padding and a
+   1.15 line height on wrapped labels. Font size and chip width are unchanged. With 8px padding the
+   longest label that still fits one line beside its mark (298px) stays on one line, so at worst two
+   labels wrap. All six chips in one box, marked: box y 291-621 at 1280x710 (floor = bar - 8 = 628). */
+/* S9 corrections (Noa 2026-11-03): use the previous screens' 40px right margin.
+   Wider columns keep both role descriptions on one line. Reserve three chip rows;
+   excess items scroll inside the fixed box without moving the bank or navigation. */
+.ddc-main { top: calc(50% - 355px + 100px); left: calc(50% - 640px + 40px); width: 1200px; align-items: flex-start; }
+.ddc-head { width: 812px; }
+.ddc-bins { width: 100%; gap: 16px; }
+.ddc-bin-head { height: 72px; }
+.ddc-bin-head__text { white-space: nowrap; }
+/* Narrow drop boxes, preserving the wider one-line headers and increasing the space between boxes. */
+.ddc-bin { width: 420px; align-self: flex-start; flex: 0 0 169px; height: 169px; min-height: 169px; padding: 10px 6px; overflow-y: auto; overflow-x: hidden; }
+.ddc-bin__cards { flex: 0 0 auto; }
+/* Keep the bank pill dimensions after dropping; three 42px rows + two 8px gaps fit without scrolling. */
+.ddc-bin .ddc-chip--placed { width: var(--ddqp-pill-w); height: 42px; min-height: 42px; flex: 0 0 42px; padding-top: 0; padding-bottom: 0; white-space: nowrap; }
+.ddc-bin .ddc-chip.correct, .ddc-bin .ddc-chip.wrong { padding-left: 10px; gap: 8px; }
+
+/* ===== Paragraph DnD — one blank + labelled bank (S13, slide 18) ===== */
+.ddqp-bank-wrap { display: flex; flex-direction: column; gap: 16px; }
+.ddqp-bank-label { margin: 0; font: 400 24px/normal Calibri, Carlito, Arial, sans-serif; color: var(--black-100); text-align: right; text-box: trim-both cap alphabetic; }
+.ddqp-media .ph { border-width: 0; border-radius: 13px; }
+/* S13 feedback popup — template default position (x 0, 426 wide, bottom on the bar); the
+   2026-10-19 override under the text column was removed (popup alignment, Noa 2026-10-25). */
+
+/* ===== Feedback popup — authored bulleted list (S6, slide 10: buChar •) =====
+   Same Regular 20 body; RTL bullets hang on the right, the list follows the paragraph
+   above it with no extra gap (the body paragraphs carry none either). */
+.scq-popup-body .fb-list { margin: 0; padding: 0 22px 0 0; list-style: disc; }
+.scq-popup-body .fb-list li { margin: 0; }
+
+/* ===== FlipCardsReveal (S2 slides 5-6, S7 slides 11-12) =====
+   Figma Templates "FlipCard-Image-State 01-Beforeinteration" (4943:37313) and
+   "FlipCard-State 03-Revealed" (4943:37294): one column centred at y 50% - 50.25px of
+   the 1280x710 frame, 56px from the Text Content Layout (810 wide, 24px gap; title
+   Headings/H-6 40 Bold, text 28) to the "Flip Card Row Layout" (40px side padding,
+   22px gap). Card 283 x 283. Side A: white, 3px Natural/Alpha/200 @40%, radius 16,
+   16px padding, image slot 251 radius 16. Side B: Subject/100, 3px Subject/500,
+   radius 24, padding 24 / 16, Body/B-4 24 Regular, right-aligned from the top.
+   Header copy centred, the first paragraph Regular and the instruction line Bold (as
+   the approved methodica-science-mass-liquid-02-01 S8 of the same nodes).
+   LOCAL VARIANT: a caption under each card (the slides' bold card titles), styled as
+   that reference's caption = InfoCardsImage card title (Headings/H-8 32 Bold),
+   12px under the card, outside the flipping element. Flip mechanics ported from it. */
+.frc-content {
+  position: absolute; left: calc(50% - 640px); width: 1280px;
+  top: calc(50% - 50.25px); transform: translateY(-50%);
+  display: flex; flex-direction: column; align-items: center; gap: 56px;
+}
+.frc-head { width: 810px; display: flex; flex-direction: column; gap: 24px; color: var(--black-100); text-align: center; }
+.frc-title { margin: 0; font: 700 40px/normal Calibri, Carlito, Arial, sans-serif; text-box: trim-both cap alphabetic; }
+.frc-text { display: flex; flex-direction: column; }
+.frc-text p { margin: 0; font: 400 22px/normal Calibri, Carlito, Arial, sans-serif; }
+.frc-text p.frc-text__instr { font-weight: 700; }
+.frc-row { width: 100%; box-sizing: border-box; padding: 0 40px; display: flex; flex-wrap: wrap; justify-content: center; align-items: flex-start; gap: 22px; direction: rtl; }
+.frc-card-wrap { width: 283px; display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.frc-card-caption { margin: 0; font: 700 32px/normal Calibri, Carlito, Arial, sans-serif; color: var(--black-100); text-align: center; text-box: trim-both cap alphabetic; }
+.frc-card {
+  position: relative; display: block; width: 283px; height: var(--frc-card-h, 283px); padding: 0; margin: 0;
+  border: 0; background: transparent; cursor: pointer; outline: none; perspective: 900px;
+  font: inherit; color: inherit; text-align: inherit;
+}
+.frc-card-inner {
+  position: absolute; inset: 0; display: block;
+  transform-style: preserve-3d;
+  transition: transform 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.frc-card.is-flipped .frc-card-inner { transform: rotateY(-180deg); }
+.frc-card-front, .frc-card-back {
+  position: absolute; inset: 0; box-sizing: border-box; overflow: hidden;
+  backface-visibility: hidden; -webkit-backface-visibility: hidden;
+}
+.frc-card-front { display: block; padding: 13px; background: #fff; border: 3px solid rgba(201, 206, 216, 0.4); border-radius: 16px; }
+/* Contained on white, as the slides place these landscape pictures (and as the
+   reference S8): the Figma slot's "cover" would cut the pictures' sides. */
+.frc-card-front img { display: block; width: 100%; height: 100%; object-fit: contain; border-radius: 16px; background: #fff; pointer-events: none; }
+/* Slide 5 card 1: the production file carries a reflection under the picture; the
+   slide crops its top square, so the slot shows the top square of the image. */
+.frc-card-front img.frc-img--top { object-fit: cover; object-position: top center; }
+/* S7 (approved 2026-10-25): the pictures fill the whole card up to its border - no 13px
+   white padding, no letterbox bands; the landscape pictures' sides are cropped. The
+   front's overflow: hidden rounds the picture's corners. */
+#s7 .frc-card-front { padding: 0; }
+#s7 .frc-card-front img,
+#s7 .frc-card-front video { display: block; width: 100%; height: 100%; object-fit: cover; border-radius: 0; background: #fff; pointer-events: none; }
+.frc-card-back {
+  transform: rotateY(180deg);
+  /* Top-right on S2 and S7 - Noa's decision 2026-10-26, replacing the vertical centring of the
+     QA fix round 2026-10-19 (FlipCardsReveal.md / slides 6 / 12). */
+  display: flex; align-items: flex-start; justify-content: flex-start;
+  padding: 21px 13px; background: var(--subject-100);
+  border: 3px solid var(--subject-500); border-radius: 24px;
+}
+.frc-card-back-content { width: 100%; display: flex; flex-direction: column; direction: rtl; text-align: right; font: 400 22px/normal Calibri, Carlito, Arial, sans-serif; color: var(--black-100); }
+/* Q-31 (2026-10-19): the slide's mid-sentence line breaks were removed from the card backs;
+   balanced wrapping keeps the last word off a line of its own without a hard break. */
+.frc-p { display: block; text-wrap: pretty; }
+.frc-card:not(.is-flipped):hover .frc-card-front,
+.frc-card:not(.is-flipped):focus-visible .frc-card-front { border-color: var(--subject-500); }
+.frc-card.is-flipped { cursor: default; }
+#s2 .frc-card.is-flipped,
+#s7 .frc-card.is-flipped { cursor: pointer; }
+.frc-card.is-flipped:focus-visible .frc-card-back { box-shadow: 0 0 0 2px var(--subject-700); }
+@media (prefers-reduced-motion: reduce) { .frc-card-inner { transition: none; } }
+/* S7 gesture hint - a hand clicking the first card (720-templates _gesture-hints.md, click/tap).
+   Figma click hint 2904:29955: the cursor stays static on the anchor (the card's centre, at
+   its fingertip); Ripple Ring 1 (120px, 2.5 stroke, 3% fill) and Ring 2 (34px, 1.5 stroke),
+   #D219FF with a glow, run the Figma 2s timeline - here twice (finite two-cycle), framed by
+   a 0.3s fade of the whole hint in and out. The hint's own fade (s7gh-life) ends the run. */
+#s2 .frc-card-wrap { position: relative; } /* S2 hint reuses the S7 visual below. */
+#s7 .frc-card-wrap { position: relative; }
+.s7gh { position: absolute; left: 50%; top: calc(var(--frc-card-h, 283px) / 2); width: 0; height: 0; pointer-events: none; z-index: 2; opacity: 0; }
+.s7gh.hidden { display: none; }
+.s7gh-hand { position: absolute; left: -10px; top: -1px; display: block; width: 28px; height: 33px; pointer-events: none; }
+.s7gh-ring { position: absolute; box-sizing: border-box; border-radius: 50%; border-style: solid; border-color: #D219FF; opacity: 0; pointer-events: none; }
+.s7gh-ring--1 { left: -55px; top: -55px; width: 110px; height: 110px; border-width: 2.5px; background: rgba(210, 25, 255, 0.03); box-shadow: 0 0 5px rgba(210, 25, 255, 0.45); }
+.s7gh-ring--2 { left: -14px; top: -14px; width: 28px; height: 28px; border-width: 1.5px; box-shadow: 0 0 3px rgba(210, 25, 255, 0.5); }
+.s7gh.s7gh-active { animation: s7gh-life 4.6s linear both; }
+.s7gh.s7gh-active .s7gh-ring--1 { animation: s7gh-ring1-o 2s linear 0.3s 2 both, s7gh-ring1-s 2s linear 0.3s 2 both; }
+.s7gh.s7gh-active .s7gh-ring--2 { animation: s7gh-ring2-o 2s linear 0.3s 2 both, s7gh-ring2-s 2s linear 0.3s 2 both; }
+@keyframes s7gh-life {
+  0% { opacity: 0; } 6.52% { opacity: 1; } 93.48% { opacity: 1; } 100% { opacity: 0; }
+}
+@keyframes s7gh-ring1-o {
+  0%   { opacity: 0;    animation-timing-function: cubic-bezier(0.2, 0.4, 0.4, 1); }
+  5%   { opacity: 0.85; animation-timing-function: ease-out; }
+  35%  { opacity: 0.65; animation-timing-function: ease-out; }
+  45%  { opacity: 0.35; animation-timing-function: cubic-bezier(0.6, 0, 1, 1); }
+  50%  { opacity: 0; }
+  100% { opacity: 0; }
+}
+@keyframes s7gh-ring1-s {
+  0%    { scale: 0.05; animation-timing-function: cubic-bezier(0.2, 0.4, 0.4, 1); }
+  7.5%  { scale: 0.22; animation-timing-function: ease-out; }
+  22.5% { scale: 0.6;  animation-timing-function: ease-out; }
+  37.5% { scale: 0.85; animation-timing-function: ease-out; }
+  50%   { scale: 1; }
+  100%  { scale: 1; }
+}
+@keyframes s7gh-ring2-o {
+  0%   { opacity: 0;    animation-timing-function: cubic-bezier(0.05, 0.9, 0.1, 1); }
+  3%   { opacity: 0.75; animation-timing-function: cubic-bezier(0.4, 0, 1, 1); }
+  10%  { opacity: 0; }
+  100% { opacity: 0; }
+}
+@keyframes s7gh-ring2-s {
+  0%   { scale: 0.2; animation-timing-function: cubic-bezier(0.05, 0.9, 0.1, 1); }
+  3%   { scale: 1;   animation-timing-function: cubic-bezier(0.4, 0, 1, 1); }
+  10%  { scale: 1.1; }
+  100% { scale: 1.1; }
+}
+@media (prefers-reduced-motion: reduce) { .s7gh { display: none !important; } }
+
+/* ===== Table fill-in with dropdowns — LOCAL VARIANT (S10, slide 15) =====
+   Figma FillInTheBlankTableQuestion-Text State01/02 (5069:37391 / 5069:37452): Text
+   Content Layout 790 wide, right 40, top 139 (Body/B-1 28, Natural/800); table right 40,
+   top 299. Cells: 52px rows, 12px side padding; header Subject/100 + Questions/Q-3 (22
+   SemiBold), 1px #D4D4D4 borders, top corners radius 8; body white + Questions/Q-1 (22
+   Regular), 1px #ECECEC borders. 5 columns (the frame shows 4): row-header column 161
+   (the frame's cell width), data columns content-sized; rows grow for the authored
+   two-line cells. */
+.tbq-head {
+  position: absolute; top: calc(50% - 355px + 139px); right: calc(50% - 640px + 40px); width: 790px;
+  display: flex; flex-direction: column; gap: 16px; direction: rtl; text-align: right; color: var(--black-100);
+}
+.tbq-text { margin: 0; font: 400 22px/normal Calibri, Carlito, Arial, sans-serif; }
+.tbq-text strong { font-weight: 700; }
+/* The bold line ran 737px + "מסכמת:" alone on line 2; balanced, it breaks into two even lines
+   (QA 2026-10-19). Its left end moves from x 503 to ~816. */
+.tbq-text { text-wrap: balance; }
+.tbq-wrap { position: absolute; top: calc(50% - 355px + 299px); right: calc(50% - 640px + 40px); }
+.tbq-table { border-collapse: separate; border-spacing: 0; direction: rtl; color: var(--black-100); }
+.tbq-cell {
+  height: 52px; box-sizing: border-box; padding: 4px 12px; min-width: 161px;
+  background: #fff; border: 0 solid var(--natural-300); border-width: 0 0 1px 1px;
+  font: 400 22px/1.2 Calibri, Carlito, Arial, sans-serif; text-align: right; vertical-align: middle;
+}
+.tbq-table tr > :first-child { border-right-width: 1px; }
+.tbq-cell--head, .tbq-cell--row { font-weight: 600; }
+thead .tbq-cell--head { background: var(--subject-100); border-color: #D4D4D4; border-top-width: 1px; }
+thead tr > :first-child { border-top-right-radius: 8px; }
+thead tr > :last-child { border-top-left-radius: 8px; }
+.tbq-cell--blank { padding: 4px 8px; }
+/* S10 feedback popup — template default position (x 0, 426 wide, bottom on the bar);
+   Q-30 reopened (Noa 2026-10-25): the 2026-10-19 override above the table was removed. */
+
+/* ===== DropdownQuestion — "Dropdown Menu" (110:1703), ported from
+   methodica-science-mass-liquid-02-06 S3. Trigger: white, 1px Natural/600 @50%, radius 10,
+   17px side padding, value right / 16x8 chevron left; open = 1.5px Subject/500; empty =
+   "בחרו תשובה" at 50%. Verdict = 1px green / red, 16x16 icon right of the value, no
+   chevron. List opens 15px under the trigger (the trigger stacks above it), options 34
+   tall with 1px dividers. Table delta (S10): 22px text = the table's Questions/Q-1 role,
+   and the trigger is sized to its widest text ("בחרו תשובה") per the template. ===== */
+.dq-dropdown-wrap { position: relative; width: 176px; height: 42px; z-index: 1; margin: 0; }
+.dq-dropdown-wrap.is-open { z-index: 6; }
+.dq-btn {
+  position: relative; z-index: 2;
+  display: flex; align-items: center; gap: 16px; direction: rtl;
+  width: 100%; height: 42px; box-sizing: border-box; padding: 0 17px;
+  background: #fff; border: 1px solid rgba(174, 174, 174, 0.5); border-radius: 10px;
+  font: 400 22px Calibri, Carlito, Arial, sans-serif; color: var(--black-100); text-align: right; cursor: pointer;
+}
+.dq-btn[aria-expanded="true"] { border: 1.5px solid var(--subject-500); padding: 0 16.5px; }
+.dq-btn:hover:not(:disabled) { border-color: var(--subject-500); }
+.dq-btn:focus-visible { outline: 2px solid var(--subject-700); outline-offset: 2px; }
+.dq-btn:disabled { cursor: default; }
+.dq-selected { flex: 1 1 auto; min-width: 0; text-box: trim-both cap alphabetic; white-space: nowrap; }
+.dq-selected.is-prompt { opacity: 0.5; }
+.dq-chevron { flex: 0 0 16px; width: 16px; height: 8px; color: var(--gray-100); }
+.dq-btn.dq-correct { border: 1px solid var(--green-80); padding: 0 17px; gap: 10px; }
+.dq-btn.dq-wrong { border: 1px solid var(--red-100); padding: 0 17px; gap: 10px; }
+.dq-correct .dq-chevron, .dq-wrong .dq-chevron { display: none; }
+.dq-verdict-ico { flex: 0 0 16px; width: 16px; height: 16px; }
+.dq-list {
+  position: absolute; top: calc(100% - 15px); left: 0; z-index: 1;
+  width: 100%; box-sizing: border-box; margin: 0; padding: 24px 8px 8px; list-style: none;
+  background: #fff; box-shadow: inset 0 0 0 1px var(--natural-300); border-radius: 8px;
+}
+.dq-option {
+  position: relative; display: flex; align-items: center; height: 34px; box-sizing: border-box;
+  padding: 0 20px; border-radius: 8px; direction: rtl; text-align: right;
+  font: 400 22px Calibri, Carlito, Arial, sans-serif; color: var(--black-100); cursor: pointer;
+}
+.dq-option + .dq-option { margin-top: 17px; }
+.dq-option + .dq-option::before { content: ''; position: absolute; top: -9px; left: 0; right: 0; height: 1px; background: var(--natural-300); }
+.dq-option:hover, .dq-option:focus-visible, .dq-option[aria-selected="true"] { background: var(--subject-300); outline: none; }
+/* Table context only (S10): the open list lies over the next rows' cells, whose 1px borders match
+   its own #ECECEC edge, so it read as part of the table. A soft drop shadow lifts it off the cells,
+   as the open panel on slide 15 does. The Figma component (1647:17046) has no shadow - this delta
+   needs visual approval (QA fix round 2026-10-19). */
+.tbq-table .dq-list { box-shadow: inset 0 0 0 1px var(--natural-300), 0 4px 12px rgba(0, 0, 0, 0.12); }
+
+/* ===== Arabic build overrides (widths were sized for the Hebrew labels) ===== */
+/* Hint button sat at left:190px = right of the 140px Hebrew check button; the Arabic check label is ~181px wide. */
+.scq-hint { left: 240px; }
+/* Flag button hover label "هل وجدتم مشكلة؟" wrapped into two overlapping lines (80px box, 10px line-height): one line. */
+.flag-btn__label { width: auto; white-space: nowrap; line-height: 1.3; }
+.flag-btn:hover, .flag-btn:focus-visible { height: auto; min-height: 68px; }
+/* Drag-and-drop chips (screen 9): the longest Arabic chip is wider than the 368px pill at 22px. */
+.ddc-chip, .ddc-bin .ddc-chip--placed { font-size: 19px; line-height: 1.05; white-space: normal; padding-inline: 10px; }
+/* Screen 5 applet: "ادفعوا إلى الأسفل" overlapped the down arrow (label was centred for a short Hebrew word); vessel captions wrapped to 3 lines. */
+.s5-push { justify-content: flex-start; padding-left: 40px; }
+.s5-cap--gas, .s5-read--gas { left: 214px; width: 155px; }
+.s5-cap--liquid, .s5-read--liquid { left: 8px; width: 178px; }
+
+/* ===== Problem-report modal, copied from the approved יעד 14 Arabic build (unit-css/styles.css) ===== */
+/* ---------- Problem-report modal (approved-units pattern, theme tokens) ---------- */
+.report-modal-overlay { position: absolute; inset: 0; z-index: 200; background: rgba(0,0,0,0.55); display: flex; align-items: center; justify-content: center; direction: rtl; }
+
+.report-modal-overlay[hidden] { display: none; }
+
+.report-modal-box { width: 520px; background: #fff; border-radius: 16px; padding: 36px 36px 28px; position: relative; box-shadow: 0 20px 60px rgba(0,0,0,0.35); display: flex; flex-direction: column; gap: 18px; direction: rtl; }
+
+.report-confirm-box { width: 420px; padding: 40px 36px 32px; gap: 20px; }
+
+.report-close-btn { position: absolute; top: 14px; left: 14px; width: 32px; height: 32px; border: none; background: none; font-size: 17px; color: #8A9AAA; cursor: pointer; border-radius: 50%; display: flex; align-items: center; justify-content: center; outline: none; transition: background 0.12s, color 0.12s; }
+
+.report-close-btn:hover { background: #F0F2F5; color: #303030; }
+
+.report-close-btn:focus-visible { outline: 2px solid var(--subject-500); }
+
+.report-modal-title { font-size: 26px; font-weight: 700; color: #1A2744; line-height: 1.2; }
+
+.report-modal-body { font-size: 18px; color: #5A6A7A; line-height: 1.5; margin-top: -6px; }
+
+.report-field { display: flex; flex-direction: column; gap: 6px; }
+
+.report-label { font-size: 16px; font-weight: 600; color: #303030; }
+
+.required-star { color: #D32F2F; }
+
+.report-select { height: 44px; border: 2px solid #C9CED8; border-radius: 10px; padding: 0 14px; font-family: Calibri, Carlito, Arial, sans-serif; font-size: 17px; color: #303030; background: #fff; direction: rtl; outline: none; cursor: pointer; transition: border-color 0.12s; }
+
+.report-select:focus { border-color: var(--subject-500); }
+
+.report-textarea { border: 2px solid #C9CED8; border-radius: 10px; padding: 12px 14px; font-family: Calibri, Carlito, Arial, sans-serif; font-size: 16px; color: #303030; direction: rtl; resize: none; outline: none; transition: border-color 0.12s; line-height: 1.5; }
+
+.report-textarea:focus { border-color: var(--subject-500); }
+
+.report-char-count { font-size: 13px; color: #8A9AAA; text-align: left; direction: ltr; }
+
+.report-actions { display: flex; flex-direction: row; gap: 12px; direction: rtl; margin-top: 4px; }
+
+.report-error { color: #d33; font-size: 14px; margin: 4px 0 8px; direction: rtl; }
+
+.report-thanks { text-align: center; padding: 8px 0; direction: rtl; }
+
+.report-submit-btn { height: 44px; padding: 0 32px; background: linear-gradient(180deg, var(--subject-500), var(--subject-700)); color: #fff; border: none; border-radius: 50px; font-family: Calibri, Carlito, Arial, sans-serif; font-size: 18px; font-weight: 600; cursor: pointer; outline: none; transition: opacity 0.12s; }
+
+.report-submit-btn:hover { opacity: 0.88; }
+
+.report-submit-btn:focus-visible { outline: 3px solid var(--subject-500); outline-offset: 3px; }
+
+.report-cancel-btn { height: 44px; padding: 0 28px; background: #fff; color: #5A6A7A; border: 2px solid #C9CED8; border-radius: 50px; font-family: Calibri, Carlito, Arial, sans-serif; font-size: 18px; font-weight: 400; cursor: pointer; outline: none; transition: border-color 0.12s, color 0.12s; }
+
+.report-cancel-btn:hover { border-color: #8A9AAA; color: #303030; }
+
+.report-cancel-btn:focus-visible { outline: 3px solid var(--subject-500); outline-offset: 3px; }
+/* The report modal's select: the NATIVE chevron is drawn by the UA hard
+   against the field's inline-end (left, in RTL) edge, and `padding-left`
+   cannot move it - which is why the earlier padding-only fix left it looking
+   stuck to the border. Draw our own chevron instead and place it properly.
+   (producer 05.10) */
+.report-select {
+  appearance: none; -webkit-appearance: none; -moz-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%23303030' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: left 16px center;
+  padding-left: 40px !important;   /* keeps the longest option clear of it */
+}
+/* fade only when the window opens (display none -> flex); .m-popup would restart it on every typed letter */
+.report-modal-overlay:not([hidden]) { animation: m-fade-in var(--m-popup-duration, 260ms) var(--m-ease, ease-out) both; }
+
+/* S6: the retry popup would cover the first card that returns to the bank - show it top-left (still draggable) */
+#s6-popup.type-retry { top: 100px; bottom: auto; }

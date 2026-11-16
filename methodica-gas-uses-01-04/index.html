@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>نشاط صفّي — methodica-gas-uses-01-04</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/motion.css">
+</head>
+<body>
+<div id="app">
+
+  <!-- Global: Report Problem (Figma 207:3590). Visual only — as parts 01-02. -->
+  <button class="flag-btn" id="flag-btn" type="button" aria-label="هل وجدتم مشكلة؟">
+    <span class="flag-btn__icon" aria-hidden="true"></span>
+    <span class="flag-btn__label" aria-hidden="true">هل وجدتم مشكلة؟</span>
+  </button>
+
+  <!-- Global: Image Zoom (720-templates _global-components "Image zoom"). -->
+  <div id="img-zoom-modal" class="img-zoom-modal hidden" aria-hidden="true">
+    <div class="img-zoom-modal__backdrop" data-zoom-close="true"></div>
+    <div class="img-zoom-modal__panel" role="dialog" aria-modal="true" aria-label="عرض الصورة مكبّرة">
+      <button class="img-zoom-modal__close" type="button" aria-label="إغلاق الصورة" data-zoom-close="true">
+        <svg class="img-zoom-modal__close-icon" aria-hidden="true" width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M14.651 0.348955C14.4275 0.125519 14.1244 0 13.8084 0C13.4924 0 13.1893 0.125519 12.9658 0.348955L7.5 5.81474L2.03422 0.348955C1.81071 0.125519 1.50762 0 1.19159 0C0.875553 0 0.572458 0.125519 0.348955 0.348955C0.125519 0.572458 0 0.875553 0 1.19159C0 1.50762 0.125519 1.81071 0.348955 2.03422L5.81474 7.5L0.348955 12.9658C0.125519 13.1893 0 13.4924 0 13.8084C0 14.1244 0.125519 14.4275 0.348955 14.651C0.572458 14.8745 0.875553 15 1.19159 15C1.50762 15 1.81071 14.8745 2.03422 14.651L7.5 9.18526L12.9658 14.651C13.1893 14.8745 13.4924 15 13.8084 15C14.1244 15 14.4275 14.8745 14.651 14.651C14.8745 14.4275 15 14.1244 15 13.8084C15 13.4924 14.8745 13.1893 14.651 12.9658L9.18526 7.5L14.651 2.03422C14.8745 1.81071 15 1.50762 15 1.19159C15 0.875553 14.8745 0.572458 14.651 0.348955Z" fill="currentColor"/></svg>
+      </button>
+      <div class="img-zoom-modal__stage" id="img-zoom-modal-stage"></div>
+    </div>
+  </div>
+
+  <!-- ============ S0 (screen 0) — TransitionScreen B — slide 36 ============
+       Presenter note: "שם המסך בפיגמה: SectionIntroScreen-ShortText" = TransitionScreen B
+       (4905:25066) by name (TransitionScreen.md 4). Roles (B): lead-in "השלמת בהצלחה את
+       התרגול – כל הכבוד!" (Body/B-1 Regular), headline "זמן טוב ללמוד גם בצורה אחרת"
+       (Heading/H-4; the slide's 48pt bold run snaps to the variant token), closing line
+       "כי למידה מתרחשת בכל מיני צורות." (Body/B-1, the authored bold kept). The copy fits both
+       entries (from standard A in part 02 and from standard B in part 03).
+       Continue: the slide authors no button (no bottom bar on slides 36-37) -> the module-wide
+       fallback "שנמשיך?" (_global-components "Continue button" 3). Back = "חזרה" to the actual
+       previous part (route stack), hidden on a fresh direct entry.
+       Media = the companion looking around, "s0-yellow-looking.mp4" (received from Noa
+       2026-10-25 as "yellow_looking.mp4"; replaces the S-05 placeholder on this screen only;
+       asset approval still open). Same treatment as part 01 S11: decorative muted one-shot (plays once, holds the last frame), no
+       controls, aria-hidden; played on entry by s0Enter(), paused on leave by goTo(); reduced
+       motion = the first frame, static (approved local change, Noa 2026-10-25). -->
+  <section class="screen active" data-screen="0" id="s0">
+    <div class="s1-content s1-content--stack">
+      <div class="s1-text" data-reveal="1">
+        <p class="s1-subtitle s1-subtitle--b-lead">أكملتم التدريب – أحسنتم!</p>
+        <h1 class="s1-title">وقت رائع للتعلم بطريقة مختلفة أيضًا</h1>
+        <p class="s1-subtitle"><strong>لأن التعلم يحدث بأشكال مختلفة.</strong></p>
+      </div>
+      <div class="s1-video-wrap" data-reveal="2" data-reveal-fade>
+        <div class="s1-video-clip"><video class="s1-char-media" id="s0-video" src="assets/video/s0-yellow-looking.mp4" muted playsinline preload="auto" disablepictureinpicture aria-hidden="true" tabindex="-1"></video></div>
+      </div>
+    </div>
+    <button class="btn-continue" type="button" onclick="advanceScreen()"><span class="nav-label"><span>متابعة</span></span></button>
+    <button class="btn-back" id="s0-back" type="button" hidden onclick="goBack()"><span class="nav-label"><span>رجوع</span></span></button>
+  </section>
+
+  <!-- ============ S1 (screen 1) — TextWithCallout, media=image — slide 37 ============
+       Presenter note: "שם המסך בפיגמה: TextWithCallout (media=image)", "תמונה:תמונה55",
+       Alt Text "תמונה 5: שני מכלי צלילה בגדלים שונים עומדים על חוף הים." (alt = the text after
+       the shape label, identical to the PPTX shape descr).
+       Figma "Screen Templates/TextWithCallout" 982:17031, built as part 01 S0 (slide 3):
+       H-6 title centred at y 64; text column 790 right; image column 304 left.
+       LOCAL ADAPTATION (docs/component-04.md C4-02, C4-03):
+       - no Speech Bubble (the slide has none - Q-19 precedent); image top-aligned with text;
+       - the slide's grey rounded box around the task is kept (Natural/200) - C4-02;
+       - picture enlarged locally to 338x422 in a 354 card, x 40-394 (C4-03 option B, approved
+         2026-10-19); the template's 230x288 is not used on this screen.
+       Image file = the PPTX original ppt/media/image36.jpeg (1440x1800), byte copy - the same photo
+         as the production file "תמונה55.jpg" (432x540, a downscaled export; pixel-compared, C4-07).
+       Text: three authored groups in slide order, each <a:p> break kept as <br>
+       (_question-template-defaults "Paragraph structure"; "ולתכונות / הגז" is an explicit
+       paragraph in the PPTX - C4-04). Bold runs as authored. The double space in
+       "לנסח  במחברת" is kept in the source (renders as one space - C4-05).
+       No interaction: the task is done in the notebook; Continue always enabled ("שנמשיך?",
+       no authored label). It is the part's exit -> part 05 (inert until it exists). -->
+  <section class="screen" data-screen="1" id="s1">
+    <h1 class="twc-title" data-reveal="1">ما الذي تودّون استكشافه؟</h1>
+    <div class="twc-row">
+      <div class="twc-text" data-reveal="2">
+        <p>تأمّلوا أسطوانتَي الغوص في الصورة.<br/>كلتاهما تُستخدمان لتخزين الهواء، لكنهما تختلفان في الحجم.</p>
+        <div class="twc-task">
+          <p><strong>مهمّتكم:</strong><br/>اكتبوا في الدفتر سؤال بحث واحدًا يتعلّق بأسطوانات الغوص وبخصائص الغاز التي تعلّمتموها.</p>
+        </div>
+        <p><strong>انتبهوا!</strong><br/>سؤال البحث الجيد هو سؤال يمكن فحصه بواسطة تجربة أو قياس، وليس سؤالًا يُجاب عنه بالاعتماد على معرفة سابقة فقط.</p>
+      </div>
+      <div class="twc-media">
+        <div class="scq-img twc-img" data-reveal="3" data-reveal-fade>
+          <div class="scq-img-inner" data-zoom-wrapper>
+            <img src="assets/img/s1-diving-tanks.jpg" width="1440" height="1800" alt="أسطوانتا غوص بحجمين مختلفين موضوعتان على شاطئ البحر.">
+          </div>
+        </div>
+      </div>
+    </div>
+    <button class="btn-continue" id="s1-continue" type="button" onclick="advanceScreen()"><span class="nav-label"><span>متابعة</span></span></button>
+    <button class="btn-back" type="button" onclick="goBack()"><span class="nav-label"><span>رجوع</span></span></button>
+  </section>
+
+
+<!-- Problem-report modal (approved-units pattern; posts to the shared Google Form) -->
+  <div id="report-modal" class="report-modal-overlay" hidden role="dialog" aria-modal="true" aria-labelledby="report-modal-title">
+    <div class="report-modal-box">
+      <button class="report-close-btn" onclick="tryCloseReportModal()" aria-label="إغلاق">&#10005;</button>
+      <h2 class="report-modal-title" id="report-modal-title">التبليغ عن مشكلة</h2>
+      <p class="report-modal-body">هل هناك شيء غير واضح أو لا يعمل كما يجب؟ أخبرونا بما حدث لنتمكن من معالجة المشكلة.</p>
+      <div class="report-field">
+        <label class="report-label" for="report-type">ما هو نوع المشكلة *</label>
+        <select class="report-select" id="report-type">
+          <option value="" disabled selected>اختاروا نوع المشكلة</option>
+          <option value="technical">عطل تقني أو شيء ما لا يعمل</option>
+          <option value="unclear">هناك شيء لا أفهمه</option>
+          <option value="other">آخر</option>
+        </select>
+      </div>
+      <div class="report-field">
+        <label class="report-label" for="report-text">ماذا حدث؟ *</label>
+        <textarea class="report-textarea" id="report-text" maxlength="250" rows="4" placeholder="صفوا المشكلة‎..."></textarea>
+        <span class="report-char-count" id="report-char-count">0 / 250</span>
+      </div>
+      <p class="report-error" id="report-error" hidden>يرجى اختيار نوع المشكلة ووصف ما حدث.</p>
+      <div class="report-actions">
+        <button class="report-submit-btn" onclick="submitReport()">إرسال</button>
+        <button class="report-cancel-btn" onclick="tryCloseReportModal()">إلغاء</button>
+      </div>
+      <div class="report-thanks" id="report-thanks" hidden>
+        <p>شكرًا! تم إرسال التبليغ. سنعالج المشكلة في أقرب وقت.</p>
+        <button class="report-submit-btn" onclick="forceCloseReportModal()">إغلاق</button>
+      </div>
+    </div>
+  </div>
+  <div id="report-confirm-modal" class="report-modal-overlay" hidden role="dialog" aria-modal="true" aria-labelledby="confirm-modal-title">
+    <div class="report-modal-box report-confirm-box">
+      <h2 class="report-modal-title" id="confirm-modal-title">هل تريدون إغلاق النافذة فعلًا؟</h2>
+      <p class="report-modal-body">إذا ضغطتم على إغلاق لن يتم إرسال التبليغ</p>
+      <div class="report-actions">
+        <button class="report-cancel-btn" onclick="forceCloseReportModal()">إغلاق النافذة</button>
+        <button class="report-submit-btn" onclick="backToReportForm()">أريد التبليغ</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="js/motion.js"></script>
+<script src="js/main.js"></script>
+<script src="js/report-modal.js"></script>
+</body>
+</html>

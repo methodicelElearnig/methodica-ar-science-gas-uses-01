@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>هيّا نتحدّى أنفسنا — methodica-gas-uses-01-05</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/motion.css">
+</head>
+<body>
+<div id="app">
+
+  <!-- Global: Report Problem (Figma 207:3590). Visual only — as parts 01-04. -->
+  <button class="flag-btn" id="flag-btn" type="button" aria-label="هل وجدتم مشكلة؟">
+    <span class="flag-btn__icon" aria-hidden="true"></span>
+    <span class="flag-btn__label" aria-hidden="true">هل وجدتم مشكلة؟</span>
+  </button>
+
+  <!-- Feedback popups — Figma "Popup Feedback" size=Short, as parts 01-02. Outside every
+       .screen (shared popup contract); no close control. One per question screen. -->
+  <div class="scq-popup m-popup hidden" id="s1-popup" onpointerdown="popupPointerDown(event,'s1-popup')" role="status" aria-live="polite">
+    <p class="scq-popup-title"></p>
+    <div class="scq-popup-body"></div>
+  </div>
+  <div class="scq-popup m-popup hidden" id="s2-popup" onpointerdown="popupPointerDown(event,'s2-popup')" role="status" aria-live="polite">
+    <p class="scq-popup-title"></p>
+    <div class="scq-popup-body"></div>
+  </div>
+  <div class="scq-popup m-popup hidden" id="s3-popup" onpointerdown="popupPointerDown(event,'s3-popup')" role="status" aria-live="polite">
+    <p class="scq-popup-title"></p>
+    <div class="scq-popup-body"></div>
+  </div>
+  <div class="scq-popup m-popup hidden" id="s4-popup" onpointerdown="popupPointerDown(event,'s4-popup')" role="status" aria-live="polite">
+    <p class="scq-popup-title"></p>
+    <div class="scq-popup-body"></div>
+  </div>
+  <div class="scq-popup m-popup hidden" id="s5-popup" onpointerdown="popupPointerDown(event,'s5-popup')" role="status" aria-live="polite">
+    <p class="scq-popup-title"></p>
+    <div class="scq-popup-body"></div>
+  </div>
+  <div class="scq-popup m-popup hidden" id="s6-popup" onpointerdown="popupPointerDown(event,'s6-popup')" role="status" aria-live="polite">
+    <p class="scq-popup-title"></p>
+    <div class="scq-popup-body"></div>
+  </div>
+
+  <!-- Hints — Figma "Hint Card" (4946:39533) over the shared backdrop, no title. Texts = the
+       slides' off-canvas hint boxes, verbatim, authored paragraph breaks as <br>. Slide 42 (S3)
+       has a hint button but no hint text and its note says "אין רמז" -> no hint (C5-04). -->
+  <div class="scq-hint-overlay m-popup hidden" id="s1-hint-overlay" onclick="s1q.closeHintOnBackdrop(event)">
+    <div class="hint-card" role="dialog" aria-modal="true" aria-label="تلميح" aria-describedby="s1-hint-text">
+      <div class="hint-card__text">
+        <svg class="hint-card__ico" viewBox="0 0 26 22.2883" fill="none" aria-hidden="true"><use href="#ico-bulb"/></svg>
+        <p class="hint-card__body" id="s1-hint-text">ما الذي يوفّر «الدفع» في علبة الرذاذ - <br/>السائل نفسه، أم الغاز المضغوط داخلها؟</p>
+      </div>
+      <button class="hint-card__close" type="button" onclick="s1q.closeHint()"><span class="nav-label"><span>العودة إلى السؤال</span></span></button>
+    </div>
+  </div>
+  <div class="scq-hint-overlay m-popup hidden" id="s2-hint-overlay" onclick="s2CloseHintOnBackdrop(event)">
+    <div class="hint-card" role="dialog" aria-modal="true" aria-label="تلميح" aria-describedby="s2-hint-text">
+      <div class="hint-card__text">
+        <svg class="hint-card__ico" viewBox="0 0 26 22.2883" fill="none" aria-hidden="true"><use href="#ico-bulb"/></svg>
+        <p class="hint-card__body" id="s2-hint-text">ابدؤوا بالخاصية العلمية، ثم انتقلوا إلى المنتج، واختموا بالاستخدام.</p>
+      </div>
+      <button class="hint-card__close" type="button" onclick="s2CloseHint()"><span class="nav-label"><span>العودة إلى السؤال</span></span></button>
+    </div>
+  </div>
+  <div class="scq-hint-overlay m-popup hidden" id="s4-hint-overlay" onclick="s4q.closeHintOnBackdrop(event)">
+    <div class="hint-card" role="dialog" aria-modal="true" aria-label="تلميح" aria-describedby="s4-hint-text">
+      <div class="hint-card__text">
+        <svg class="hint-card__ico" viewBox="0 0 26 22.2883" fill="none" aria-hidden="true"><use href="#ico-bulb"/></svg>
+        <p class="hint-card__body" id="s4-hint-text">فكّروا فيما يحدث لكمية الهيليوم في الأسطوانة عند نفخ البالونات بواسطتها. هل يبقى كل الغاز في الأسطوانة؟</p>
+      </div>
+      <button class="hint-card__close" type="button" onclick="s4q.closeHint()"><span class="nav-label"><span>العودة إلى السؤال</span></span></button>
+    </div>
+  </div>
+  <div class="scq-hint-overlay m-popup hidden" id="s5-hint-overlay" onclick="s5CloseHintOnBackdrop(event)">
+    <div class="hint-card" role="dialog" aria-modal="true" aria-label="تلميح" aria-describedby="s5-hint-text">
+      <div class="hint-card__text">
+        <svg class="hint-card__ico" viewBox="0 0 26 22.2883" fill="none" aria-hidden="true"><use href="#ico-bulb"/></svg>
+        <p class="hint-card__body" id="s5-hint-text">السؤال العلمي يسعى إلى فهم ظاهرة في العالم؛ <br/>والهدف التكنولوجي يسعى إلى تطوير منتج أو تحسينه.</p>
+      </div>
+      <button class="hint-card__close" type="button" onclick="s5CloseHint()"><span class="nav-label"><span>العودة إلى السؤال</span></span></button>
+    </div>
+  </div>
+  <div class="scq-hint-overlay m-popup hidden" id="s6-hint-overlay" onclick="s6q.closeHintOnBackdrop(event)">
+    <div class="hint-card" role="dialog" aria-modal="true" aria-label="تلميح" aria-describedby="s6-hint-text">
+      <div class="hint-card__text">
+        <svg class="hint-card__ico" viewBox="0 0 26 22.2883" fill="none" aria-hidden="true"><use href="#ico-bulb"/></svg>
+        <p class="hint-card__body" id="s6-hint-text">فكّروا فيما يريد إياد أن يغيّره، وفيما يريد أن يفحصه</p>
+      </div>
+      <button class="hint-card__close" type="button" onclick="s6q.closeHint()"><span class="nav-label"><span>العودة إلى السؤال</span></span></button>
+    </div>
+  </div>
+
+  <!-- Global: Image Zoom (720-templates _global-components "Image zoom"). -->
+  <div id="img-zoom-modal" class="img-zoom-modal hidden" aria-hidden="true">
+    <div class="img-zoom-modal__backdrop" data-zoom-close="true"></div>
+    <div class="img-zoom-modal__panel" role="dialog" aria-modal="true" aria-label="عرض الصورة مكبّرة">
+      <button class="img-zoom-modal__close" type="button" aria-label="إغلاق الصورة" data-zoom-close="true">
+        <svg class="img-zoom-modal__close-icon" aria-hidden="true" width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M14.651 0.348955C14.4275 0.125519 14.1244 0 13.8084 0C13.4924 0 13.1893 0.125519 12.9658 0.348955L7.5 5.81474L2.03422 0.348955C1.81071 0.125519 1.50762 0 1.19159 0C0.875553 0 0.572458 0.125519 0.348955 0.348955C0.125519 0.572458 0 0.875553 0 1.19159C0 1.50762 0.125519 1.81071 0.348955 2.03422L5.81474 7.5L0.348955 12.9658C0.125519 13.1893 0 13.4924 0 13.8084C0 14.1244 0.125519 14.4275 0.348955 14.651C0.572458 14.8745 0.875553 15 1.19159 15C1.50762 15 1.81071 14.8745 2.03422 14.651L7.5 9.18526L12.9658 14.651C13.1893 14.8745 13.4924 15 13.8084 15C14.1244 15 14.4275 14.8745 14.651 14.651C14.8745 14.4275 15 14.1244 15 13.8084C15 13.4924 14.8745 13.1893 14.651 12.9658L9.18526 7.5L14.651 2.03422C14.8745 1.81071 15 1.50762 15 1.19159C15 0.875553 14.8745 0.572458 14.651 0.348955Z" fill="currentColor"/></svg>
+      </button>
+      <div class="img-zoom-modal__stage" id="img-zoom-modal-stage"></div>
+    </div>
+  </div>
+
+  <!-- Shared icon: the Figma hint bulb (nav button 196:6024), as part 01. -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="ico-bulb" viewBox="0 0 26 22.2883">
+      <path fill="currentColor" d="M17.7926 2.76346C16.3676 1.37911 14.5057 0.687763 12.5489 0.815548C9.07997 1.04163 6.27288 3.9168 6.01798 7.50135C5.85649 9.77363 6.70352 11.9443 8.34376 13.4548C9.23038 14.2723 9.74018 15.465 9.74018 16.7265H11.2284H14.7733H16.2616C16.2616 15.4847 16.7919 14.2707 17.7181 13.3959C19.17 12.0263 20.0012 10.0751 20.0012 8.04361C20.0012 6.01215 19.1953 4.12486 17.791 2.76018L17.7926 2.76346ZM13.0001 5.54525C11.6702 5.54525 10.5856 6.66583 10.5856 8.04525C10.5856 8.46956 10.2516 8.81524 9.84151 8.81524C9.43145 8.81524 9.09739 8.46956 9.09739 8.04525C9.09739 5.8172 10.8485 4.00527 13.0001 4.00527C13.4133 4.00527 13.7474 4.35094 13.7474 4.77526C13.7474 5.19957 13.4133 5.54525 13.0001 5.54525Z"/>
+      <path fill="currentColor" d="M9.73859 19.6245C9.73859 20.3289 9.99824 20.9908 10.478 21.4904L10.4938 21.5068C10.9783 22.0098 11.6242 22.2883 12.3114 22.2883H13.6888C14.3775 22.2883 15.025 22.0114 15.5111 21.5052C15.9956 21.0039 16.2631 20.3355 16.2631 19.6277V17.9895H9.73859V19.6245ZM11.2268 19.5294H14.7717V19.6277C14.7717 19.9243 14.6609 20.2077 14.4566 20.419C14.254 20.6254 13.9753 20.7483 13.6888 20.7483H12.3114C12.028 20.7483 11.7588 20.6336 11.5561 20.4305L11.5451 20.4174C11.3424 20.211 11.2268 19.9226 11.2268 19.6261V19.5311V19.5294Z"/>
+      <path fill="currentColor" d="M25.2558 7.27531H22.607C22.1954 7.27531 21.8629 7.62099 21.8629 8.0453C21.8629 8.46962 22.197 8.81529 22.607 8.81529H25.2558C25.6674 8.81529 25.9999 8.46962 25.9999 8.0453C25.9999 7.62099 25.6659 7.27531 25.2558 7.27531Z"/>
+      <path fill="currentColor" d="M4.1386 8.0453C4.1386 7.61935 3.80453 7.27531 3.39447 7.27531H0.744124C0.332481 7.27531 0 7.62099 0 8.0453C0 8.46962 0.334064 8.81529 0.744124 8.81529H3.39289C3.80453 8.81529 4.13701 8.46962 4.13701 8.0453H4.1386Z"/>
+      <path fill="currentColor" d="M20.8702 3.11398C21.0174 3.11398 21.1663 3.06811 21.2961 2.97472L23.4667 1.40198C23.8039 1.15788 23.8847 0.677863 23.6488 0.328911C23.4129 -0.0200418 22.949 -0.105232 22.6118 0.140509L20.4411 1.71325C20.1039 1.95736 20.0232 2.43737 20.2591 2.78632C20.4031 3.00094 20.6343 3.11562 20.8702 3.11562V3.11398Z"/>
+      <path fill="currentColor" d="M4.70374 13.1172L2.53311 14.69C2.19588 14.9341 2.11514 15.4141 2.35104 15.763C2.49512 15.9777 2.72627 16.0923 2.96217 16.0923C3.10941 16.0923 3.25824 16.0465 3.38806 15.9531L5.55869 14.3803C5.89592 14.1362 5.97667 13.6562 5.74076 13.3073C5.50486 12.9583 5.04097 12.8731 4.70374 13.1189V13.1172Z"/>
+      <path fill="currentColor" d="M23.4668 14.6884L21.2961 13.1157C20.9589 12.8716 20.495 12.9567 20.2591 13.3041C20.0232 13.653 20.1055 14.133 20.4412 14.3771L22.6118 15.9499C22.7416 16.0449 22.8905 16.0891 23.0377 16.0891C23.272 16.0891 23.5032 15.9744 23.6488 15.7598C23.8847 15.4109 23.8024 14.9309 23.4668 14.6868V14.6884Z"/>
+      <path fill="currentColor" d="M5.55868 1.71322L3.38806 0.140473C3.05083 -0.10363 2.58694 -0.0184393 2.35103 0.328875C2.11513 0.677827 2.19746 1.15784 2.53311 1.40194L4.70373 2.97469C4.83356 3.06971 4.98238 3.11394 5.12962 3.11394C5.36394 3.11394 5.5951 2.99926 5.74076 2.78465C5.97666 2.4357 5.89433 1.95568 5.55868 1.71158V1.71322Z"/>
+    </symbol>
+  </svg>
+
+  <!-- ============ S0 (screen 0) — TransitionScreen C (LongText) — slide 39 ============
+       Slide 38 (component divider "רכיב 5: בואו נאתגר את עצמנו / methodica-gas-uses-01-05") is
+       structure only, not a screen (Q-01, as slides 2/19/35).
+       Presenter note: "שם המסך בפיגמה: SectionIntroScreen-LongText" = explicit reference ->
+       variant C (4924:25836), as part 03 S5. Headline = the two bold paragraphs "זמן ל –5  שאלות
+       מתקדמות" / "ועוד הפתעות מעניינות..." (authored break kept); closing row = the regular
+       "(זה אומר שעלינו רמה ☺)" - the slide's Wingdings "J" smiley (U+F04A) rendered as its
+       Unicode equivalent U+263A (C5-02). Count 5 announced, no threshold: advanced practice is
+       never gated (_learning-journey 4). Continue: no button on the slide -> fallback "שנמשיך?"
+       (as C4-01). Back = "חזרה" -> part 04 #last via the route stack (hidden on a direct entry).
+       Media = the companion holding balloons, "s0-yellow-balloons.mp4" (received from Noa
+       2026-10-25 as "yellow_balloons.mp4"; replaces the S-05 placeholder on this screen only;
+       asset approval still open). Portrait clip (1080x1920) in the unchanged frame C, contained.
+       Same treatment as part 04 S0: decorative muted one-shot (plays once, holds the last frame), no controls, aria-hidden; played on
+       entry by s0Enter(), paused on leave by goTo(); reduced motion = the first frame, static. -->
+  <section class="screen active" data-screen="0" id="s0">
+    <div class="s1-content s1-content--c">
+      <div class="s1-text" data-reveal="1">
+        <h1 class="s1-title s1-title--c"><span>حان وقت 5 أسئلة متقدّمة</span><span>ومفاجآت مثيرة أخرى...</span></h1>
+        <p class="s1-subtitle">(هذا يعني أننا انتقلنا إلى مستوى أعلى ☺)</p>
+      </div>
+      <div class="s1-video-wrap s1-video-wrap--c" data-reveal="2" data-reveal-fade>
+        <div class="s1-video-clip"><video class="s1-char-media" id="s0-video" src="assets/video/s0-yellow-balloons.mp4" muted playsinline preload="auto" disablepictureinpicture aria-hidden="true" tabindex="-1"></video></div>
+      </div>
+    </div>
+    <button class="btn-continue" type="button" onclick="advanceScreen()"><span class="nav-label"><span>متابعة</span></span></button>
+    <button class="btn-back" id="s0-back" type="button" hidden onclick="goBack()"><span class="nav-label"><span>رجوع</span></span></button>
+  </section>
+
+  <!-- ============ S1 (screen 1) — SingleChoiceQuestionImage — slide 40 (advanced 1/5) ============
+       Presenter note: "SingleChoiceQuestion", "רמת חשיבה: ניתוח", "סרגל שאלה, שאלה 1 מתוך 5",
+       "תמונה: תמונה6", "רמז אחרי טעות ראשונה", Alt Text of תמונה 14. Options in the slide's visual
+       order; correct = option 4 (the check). Bold stem in Subject/500 (run colour 019DE5).
+       Picture = production file "תמונה6 (1).png" (the plain "תמונה6.png" in the folder is a different
+       photo; the "(1)" file is the slide's embed - C5-05); zoom. -->
+  <section class="screen" data-screen="1" id="s1">
+    <nav class="progress-question" aria-label="التنقُّل بين الأسئلة">
+      <div class="progress-question__item" data-question="1"><div class="progress-question__icon"></div><span class="progress-question__label">سؤال 1</span></div>
+      <div class="progress-question__connector" data-connector="1"><div class="progress-question__connector-line"></div></div>
+      <div class="progress-question__item" data-question="2"><div class="progress-question__icon"></div><span class="progress-question__label">سؤال 2</span></div>
+      <div class="progress-question__connector" data-connector="2"><div class="progress-question__connector-line"></div></div>
+      <div class="progress-question__item" data-question="3"><div class="progress-question__icon"></div><span class="progress-question__label">سؤال 3</span></div>
+      <div class="progress-question__connector" data-connector="3"><div class="progress-question__connector-line"></div></div>
+      <div class="progress-question__item" data-question="4"><div class="progress-question__icon"></div><span class="progress-question__label">سؤال 4</span></div>
+      <div class="progress-question__connector" data-connector="4"><div class="progress-question__connector-line"></div></div>
+      <div class="progress-question__item" data-question="5"><div class="progress-question__icon"></div><span class="progress-question__label">سؤال 5</span></div>
+    </nav>
+    <div class="scq-question">
+      <div class="scq-main" data-reveal="1">
+        <div class="scq-qtext">
+          <div class="scq-qbody">
+            <p>تخيّلوا علبة رذاذ يوجد داخلها سائل فقط، دون غاز مضغوط.</p>
+            <p class="scq-qstem scq-qstem--accent" id="s1-stem">ما الذي يُرجَّح أن يحدث عند الضغط على الزر؟</p>
+          </div>
+        </div>
+        <div class="scq-answers" role="radiogroup" aria-labelledby="s1-stem">
+          <button class="scq-opt" type="button" role="radio" aria-checked="false" data-id="a" onclick="s1q.select('a')">
+            <span class="scq-radio" aria-hidden="true"></span><span class="scq-opt-text">سيخرج السائل بسرعة أكبر، لأنه لا يوجد غاز يعيق خروجه</span><span class="vh vh-verdict"></span>
+          </button>
+          <button class="scq-opt" type="button" role="radio" aria-checked="false" data-id="b" onclick="s1q.select('b')">
+            <span class="scq-radio" aria-hidden="true"></span><span class="scq-opt-text">ستنفجر العلبة فورًا، لأن السائل لا ينضغط إطلاقًا</span><span class="vh vh-verdict"></span>
+          </button>
+          <button class="scq-opt" type="button" role="radio" aria-checked="false" data-id="c" onclick="s1q.select('c')">
+            <span class="scq-radio" aria-hidden="true"></span><span class="scq-opt-text">لن يكون هناك أي فرق - الغاز والسائل يدفعان بالمقدار نفسه</span><span class="vh vh-verdict"></span>
+          </button>
+          <button class="scq-opt" type="button" role="radio" aria-checked="false" data-id="d" onclick="s1q.select('d')">
+            <span class="scq-radio" aria-hidden="true"></span><span class="scq-opt-text">لن يخرج السائل تقريبًا، لأنه لا يوجد غاز مضغوط يدفعه إلى الخارج</span><span class="vh vh-verdict"></span>
+          </button>
+        </div>
+      </div>
+      <div class="scq-img" data-reveal="2" data-reveal-fade>
+        <div class="scq-img-inner" data-zoom-wrapper>
+          <img src="assets/img/s1-spray-can.png" width="436" height="291" alt="فتى يرشّ على نفسه بخاخ مزيل العرق في الحمّام.">
+        </div>
+      </div>
+    </div>
+    <button class="btn-continue" id="s1-check" type="button" disabled onclick="s1q.primary()"><span class="nav-label"><span>هل إجابتي صحيحة؟</span></span></button>
+    <button class="scq-hint" id="s1-hint" type="button" style="visibility:hidden" onclick="s1q.openHint()">
+      <svg class="scq-hint-ico" viewBox="0 0 26 22.2883" fill="none" aria-hidden="true"><use href="#ico-bulb"/></svg>
+      <span class="nav-label"><span>هل يمكنني الحصول على تلميح؟</span></span>
+    </button>
+    <button class="btn-back" type="button" onclick="goBack()"><span class="nav-label"><span>رجوع</span></span></button>
+  </section>
+
+  <!-- ============ S2 (screen 2) — Ordered drag-and-drop — slide 41 (advanced 2/5) ============
+       Presenter note: "OrderedDragAndDropQuestion", "סרגל שאלה, שאלה 2 מתוך 5", "רמת חשיבה: טיעון
+       מורכב", "רמז אחרי טעות ראשונה". DragAndDropQuestion "Ordered" layout (DragAndDropQuestion.md):
+       three numbered slots (the slide numbers them 1-3, no names) + three statement cards.
+       Solved layout (slide, slots x 660): 1 = "גז ניתן לדחיסה...", 2 = "ניתן לדחוס את הגז למכל...",
+       3 = "הכבאי יכול לנשום...". Bank: on the slide (x 115) the cards stand in the SAME order as
+       the solution. PRODUCTION DECISION C5-06 (Noa, 2026-10-20), NOT in the script: display order only
+       changed to 3 / 1 / 2 (top to bottom: "הכבאי...", "גז ניתן לדחיסה...", "ניתן לדחוס את הגז...") so no
+       card starts beside its own slot; correctMap, wording and drag behaviour unchanged. Statements verbatim (no final period on card 3, as
+       authored). Feedback: correct "מצוין!"; final wrong = the slide's "התשובה אינה נכונה במלואה"
+       (partly right) or the regular title (nothing right), + the solution line (fallback). -->
+  <section class="screen" data-screen="2" id="s2">
+    <nav class="progress-question" aria-label="التنقُّل بين الأسئلة">
+      <div class="progress-question__item" data-question="1"><div class="progress-question__icon"></div><span class="progress-question__label">سؤال 1</span></div>
+      <div class="progress-question__connector" data-connector="1"><div class="progress-question__connector-line"></div></div>
+      <div class="progress-question__item" data-question="2"><div class="progress-question__icon"></div><span class="progress-question__label">سؤال 2</span></div>
+      <div class="progress-question__connector" data-connector="2"><div class="progress-question__connector-line"></div></div>
+      <div class="progress-question__item" data-question="3"><div class="progress-question__icon"></div><span class="progress-question__label">سؤال 3</span></div>
+      <div class="progress-question__connector" data-connector="3"><div class="progress-question__connector-line"></div></div>
+      <div class="progress-question__item" data-question="4"><div class="progress-question__icon"></div><span class="progress-question__label">سؤال 4</span></div>
+      <div class="progress-question__connector" data-connector="4"><div class="progress-question__connector-line"></div></div>
+      <div class="progress-question__item" data-question="5"><div class="progress-question__icon"></div><span class="progress-question__label">سؤال 5</span></div>
+    </nav>
+    <div class="ord-main">
+      <div class="ord-head" data-reveal="1">
+        <p>رجال الإطفاء يحملون على ظهورهم أسطوانة هواء صغيرة تكفي للتنفس لدقائق طويلة داخل مبنى مملوء بالدخان.</p>
+        <p>ابنوا تفسيرًا متعدّد المراحل يوضّح لماذا يكون ذلك ممكنًا.</p>
+        <p class="ord-stem" id="s2-stem">اسحبوا المراحل الثلاث بالترتيب الصحيح للتفسير (الخاصية، ثم المنتج، وأخيرًا طريقة الاستخدام):</p>
+      </div>
+      <div class="ord-board" data-reveal="2" data-reveal-fade>
+        <!-- DOM order = tab order: cards first, then slots (DragAndDropQuestion.md "Ordered layout");
+             the visual columns are set by the RTL row (rows right, bank left). -->
+        <div class="ord-bank">
+          <div class="ord-slot"><button class="ord-card" id="s2-d-use" type="button" aria-pressed="false">يستطيع رجل الإطفاء التنفّس لفترة طويلة بمساعدة أسطوانة غاز، حتى في مكان لا يوجد فيه هواء نقي</button></div>
+          <div class="ord-slot"><button class="ord-card" id="s2-d-prop" type="button" aria-pressed="false">الغاز قابل للانضغاط - يمكن ضغطه إلى حجم أصغر</button></div>
+          <div class="ord-slot"><button class="ord-card" id="s2-d-tank" type="button" aria-pressed="false">يمكن ضغط الغاز في أسطوانة صغيرة يمكن حملها على الظهر</button></div>
+        </div>
+        <div class="ord-rows" role="group" aria-labelledby="s2-stem">
+          <div class="ord-row"><span class="ord-label" aria-hidden="true">1</span><div class="ord-zone" id="s2-t-1" role="button" tabindex="0" aria-label="1: فارغة"></div></div>
+          <div class="ord-row"><span class="ord-label" aria-hidden="true">2</span><div class="ord-zone" id="s2-t-2" role="button" tabindex="0" aria-label="2: فارغة"></div></div>
+          <div class="ord-row"><span class="ord-label" aria-hidden="true">3</span><div class="ord-zone" id="s2-t-3" role="button" tabindex="0" aria-label="3: فارغة"></div></div>
+        </div>
+      </div>
+      <p class="vh" id="s2-live" aria-live="polite"></p>
+    </div>
+    <button class="btn-continue" id="s2-check" type="button" disabled onclick="s2Primary()"><span class="nav-label"><span>هل إجابتي صحيحة؟</span></span></button>
+    <button class="scq-hint" id="s2-hint" type="button" style="visibility:hidden" onclick="s2OpenHint()">
+      <svg class="scq-hint-ico" viewBox="0 0 26 22.2883" fill="none" aria-hidden="true"><use href="#ico-bulb"/></svg>
+      <span class="nav-label"><span>هل يمكنني الحصول على تلميح؟</span></span>
+    </button>
+    <button class="btn-back" type="button" onclick="goBack()"><span class="nav-label"><span>رجوع</span></span></button>
+  </section>
+
+  <!-- ============ S3 (screen 3) — SingleChoiceQuestionImage — slide 42 (advanced 3/5, part א) ============
+       Presenter note: "SingleChoiceQuestion", "רמת חשיבה: יישום", "סרגל שאלה, שאלה 3 מתוך 5", "תמונה:
+       תמונה7", "אין רמז", Alt Text of תמונה 19. Correct = option 1 (the check). No hint: the note says
+       none and the slide's hint button has no hint text (C5-04, as C2-02). Picture = production file
+       "תמונה7 (2).png" (portrait - the slide's embed; the plain "תמונה7.png" is a different picture -
+       C5-05); zoom. Q3 (parts א + ב) is one progress item. -->
+  <section class="screen" data-screen="3" id="s3">
+    <nav class="progress-question" aria-label="التنقُّل بين الأسئلة">
+      <div class="progress-question__item" data-question="1"><div class="progress-question__icon"></div><span class="progress-question__label">سؤال 1</span></div>
+      <div class="progress-question__connector" data-connector="1"><div class="progress-question__connector-line"></div></div>
+      <div class="progress-question__item" data-question="2"><div class="progress-question__icon"></div><span class="progress-question__label">سؤال 2</span></div>
+      <div class="progress-question__connector" data-connector="2"><div class="progress-question__connector-line"></div></div>
+      <div class="progress-question__item" data-question="3"><div class="progress-question__icon"></div><span class="progress-question__label">سؤال 3</span></div>
+      <div class="progress-question__connector" data-connector="3"><div class="progress-question__connector-line"></div></div>
+      <div class="progress-question__item" data-question="4"><div class="progress-question__icon"></div><span class="progress-question__label">سؤال 4</span></div>
+      <div class="progress-question__connector" data-connector="4"><div class="progress-question__connector-line"></div></div>
+      <div class="progress-question__item" data-question="5"><div class="progress-question__icon"></div><span class="progress-question__label">سؤال 5</span></div>
+    </nav>
+    <div class="scq-question">
+      <div class="scq-main" data-reveal="1">
+        <div class="scq-qtext">
+          <div class="scq-qbody">
+            <p>تحتوي أسطوانة الهيليوم المستخدمة لنفخ البالونات على كمية كبيرة من الغاز في حجم صغير.</p>
+            <p class="scq-qstem scq-qstem--accent" id="s3-stem">أ. كيف يمكن إدخال كمية كبيرة كهذه من غاز الهيليوم إلى أسطوانة صغيرة؟</p>
+          </div>
+        </div>
+        <div class="scq-answers" role="radiogroup" aria-labelledby="s3-stem">
+          <button class="scq-opt" type="button" role="radio" aria-checked="false" data-id="a" onclick="s3q.select('a')">
+            <span class="scq-radio" aria-hidden="true"></span><span class="scq-opt-text">نضغط غاز الهيليوم، فنقلّل حجمه وندخل كمية كبيرة منه إلى أسطوانة صغيرة</span><span class="vh vh-verdict"></span>
+          </button>
+          <button class="scq-opt" type="button" role="radio" aria-checked="false" data-id="b" onclick="s3q.select('b')">
+            <span class="scq-radio" aria-hidden="true"></span><span class="scq-opt-text">نبرّد الهيليوم، فينكمش ويتيح إدخال كمية كبيرة منه إلى أسطوانة صغيرة</span><span class="vh vh-verdict"></span>
+          </button>
+          <button class="scq-opt" type="button" role="radio" aria-checked="false" data-id="c" onclick="s3q.select('c')">
+            <span class="scq-radio" aria-hidden="true"></span><span class="scq-opt-text">نترك الهيليوم في الأسطوانة وقتًا طويلًا، فينكمش ويتيح تخزين كمية كبيرة في أسطوانة صغيرة</span><span class="vh vh-verdict"></span>
+          </button>
+        </div>
+      </div>
+      <div class="scq-img" data-reveal="2" data-reveal-fade>
+        <div class="scq-img-inner" data-zoom-wrapper>
+          <img src="assets/img/s3-helium-tank.png" width="312" height="469" alt="أسطوانة زرقاء لنفخ البالونات. الكتابة على الأسطوانة: «غاز الهيليوم».">
+        </div>
+      </div>
+    </div>
+    <button class="btn-continue" id="s3-check" type="button" disabled onclick="s3q.primary()"><span class="nav-label"><span>هل إجابتي صحيحة؟</span></span></button>
+    <button class="btn-back" type="button" onclick="goBack()"><span class="nav-label"><span>رجوع</span></span></button>
+  </section>
+
+  <!-- ============ S4 (screen 4) — SingleChoiceQuestionImage — slide 43 (advanced 3/5, part ב) ============
+       Presenter note: "SingleChoiceQuestion", "רמת חשיבה: יישום", "שאלה 3 מתוך 5", "תמונה: תמונה8",
+       "רמז אחרי טעות ראשונה", Alt Text of תמונה 14. Correct = option 2 (the check). Options verbatim
+       ("המיכל" / "המכל" spelled as authored). Picture = production file "תמונה8.png"; zoom. -->
+  <section class="screen" data-screen="4" id="s4">
+    <nav class="progress-question" aria-label="التنقُّل بين الأسئلة">
+      <div class="progress-question__item" data-question="1"><div class="progress-question__icon"></div><span class="progress-question__label">سؤال 1</span></div>
+      <div class="progress-question__connector" data-connector="1"><div class="progress-question__connector-line"></div></div>
+      <div class="progress-question__item" data-question="2"><div class="progress-question__icon"></div><span class="progress-question__label">سؤال 2</span></div>
+      <div class="progress-question__connector" data-connector="2"><div class="progress-question__connector-line"></div></div>
+      <div class="progress-question__item" data-question="3"><div class="progress-question__icon"></div><span class="progress-question__label">سؤال 3</span></div>
+      <div class="progress-question__connector" data-connector="3"><div class="progress-question__connector-line"></div></div>
+      <div class="progress-question__item" data-question="4"><div class="progress-question__icon"></div><span class="progress-question__label">سؤال 4</span></div>
+      <div class="progress-question__connector" data-connector="4"><div class="progress-question__connector-line"></div></div>
+      <div class="progress-question__item" data-question="5"><div class="progress-question__icon"></div><span class="progress-question__label">سؤال 5</span></div>
+    </nav>
+    <div class="scq-question">
+      <div class="scq-main" data-reveal="1">
+        <div class="scq-qtext">
+          <div class="scq-qbody">
+            <p>وُزنت أسطوانة الهيليوم وهي ممتلئة، ثم وُزنت مرة أخرى بعد نفخ عدة بالونات بواسطتها.</p>
+            <p class="scq-qstem scq-qstem--accent" id="s4-stem">ب. كيف ستتغيّر كتلة الأسطوانة بعد نفخ البالونات؟</p>
+          </div>
+        </div>
+        <div class="scq-answers" role="radiogroup" aria-labelledby="s4-stem">
+          <button class="scq-opt" type="button" role="radio" aria-checked="false" data-id="a" onclick="s4q.select('a')">
+            <span class="scq-radio" aria-hidden="true"></span><span class="scq-opt-text">ستقلّ كتلة الأسطوانة، لأن الغاز المتبقي فيها ينكمش ويشغل حيّزًا أقل</span><span class="vh vh-verdict"></span>
+          </button>
+          <button class="scq-opt" type="button" role="radio" aria-checked="false" data-id="b" onclick="s4q.select('b')">
+            <span class="scq-radio" aria-hidden="true"></span><span class="scq-opt-text">ستقلّ كتلة الأسطوانة، لأن جزءًا من الهيليوم خرج منها وانتقل إلى البالونات</span><span class="vh vh-verdict"></span>
+          </button>
+          <button class="scq-opt" type="button" role="radio" aria-checked="false" data-id="c" onclick="s4q.select('c')">
+            <span class="scq-radio" aria-hidden="true"></span><span class="scq-opt-text">لن تتغيّر كتلة الأسطوانة، لأن الغاز المتبقي يستمر في ملء حجم الأسطوانة كله</span><span class="vh vh-verdict"></span>
+          </button>
+        </div>
+      </div>
+      <div class="scq-img" data-reveal="2" data-reveal-fade>
+        <div class="scq-img-inner" data-zoom-wrapper>
+          <img src="assets/img/s4-helium-balloons.png" width="505" height="336" alt="فتاةٌ تنفخ بالونًا ورديًا من أسطوانةٍ زرقاء لنفخ البالونات، وبجانبها بالونات ملونة. الكتابة على الأسطوانة: «غاز الهيليوم».">
+        </div>
+      </div>
+    </div>
+    <button class="btn-continue" id="s4-check" type="button" disabled onclick="s4q.primary()"><span class="nav-label"><span>هل إجابتي صحيحة؟</span></span></button>
+    <button class="scq-hint" id="s4-hint" type="button" style="visibility:hidden" onclick="s4q.openHint()">
+      <svg class="scq-hint-ico" viewBox="0 0 26 22.2883" fill="none" aria-hidden="true"><use href="#ico-bulb"/></svg>
+      <span class="nav-label"><span>هل يمكنني الحصول على تلميح؟</span></span>
+    </button>
+    <button class="btn-back" type="button" onclick="goBack()"><span class="nav-label"><span>رجوع</span></span></button>
+  </section>
+
+  <!-- ============ S5 (screen 5) — two-group sort with a picture — slide 44 (advanced 4/5) ============
+       Presenter note: "TextOnlyDragAndDropQuestion", "רמת חשיבה: הבנת טבע הידע", "שאלה 4 מתוך 5", "תמונה:
+       מדעית וטכנולוגית", "רמז אחרי טעות ראשונה", Alt Text of תמונה 51. The named Figma family
+       (1717:40975) is rows of sentence + slot; the slide sorts four statements into two titled boxes,
+       two each -> LOCAL VARIANT: part 01 S9's two-bin categorisation DnD (.ddc-*), with the slide's
+       picture beside the boxes. Solved layout (PPTX): "שאלה מדעית" (right box) = "עד כמה נדחס אוויר
+       לעומת מים..." + "מדוע גז ממלא את כל נפח הכלי..."; "מטרה טכנולוגית" (left box) = "כיצד לתכנן כרית
+       אוויר..." + "איך לבנות מכל צלילה...". Bank = the slide's bank row, right to left. The authored
+       breaks inside the SOLVED boxes are box-width wraps (the bank copies of the same statements have
+       none) -> statements as single paragraphs. Picture = production file "מדעית וטכנולוגית.png"
+       (= the embed's size); zoom. -->
+  <section class="screen" data-screen="5" id="s5">
+    <nav class="progress-question" aria-label="التنقُّل بين الأسئلة">
+      <div class="progress-question__item" data-question="1"><div class="progress-question__icon"></div><span class="progress-question__label">سؤال 1</span></div>
+      <div class="progress-question__connector" data-connector="1"><div class="progress-question__connector-line"></div></div>
+      <div class="progress-question__item" data-question="2"><div class="progress-question__icon"></div><span class="progress-question__label">سؤال 2</span></div>
+      <div class="progress-question__connector" data-connector="2"><div class="progress-question__connector-line"></div></div>
+      <div class="progress-question__item" data-question="3"><div class="progress-question__icon"></div><span class="progress-question__label">سؤال 3</span></div>
+      <div class="progress-question__connector" data-connector="3"><div class="progress-question__connector-line"></div></div>
+      <div class="progress-question__item" data-question="4"><div class="progress-question__icon"></div><span class="progress-question__label">سؤال 4</span></div>
+      <div class="progress-question__connector" data-connector="4"><div class="progress-question__connector-line"></div></div>
+      <div class="progress-question__item" data-question="5"><div class="progress-question__icon"></div><span class="progress-question__label">سؤال 5</span></div>
+    </nav>
+    <div class="srt-main">
+      <div class="srt-head" data-reveal="1">
+        <p class="srt-stem" id="s5-stem">صنّفوا كل عبارة إلى المجموعة الصحيحة:</p>
+        <p>«سؤال علمي» (لفهم خاصية) أو «هدف تكنولوجي» (لتطوير منتج أو تحسينه).</p>
+      </div>
+      <div class="srt-row" data-reveal="2" data-reveal-fade>
+        <div class="srt-bins" role="group" aria-labelledby="s5-stem">
+          <div class="srt-bin-col">
+            <p class="srt-bin-name" id="s5-n-sci">سؤال علمي</p>
+            <div class="ddc-bin" id="s5-b-sci" role="button" tabindex="0" data-count="0"><div class="ddc-bin__cards"></div></div>
+          </div>
+          <div class="srt-bin-col">
+            <p class="srt-bin-name" id="s5-n-tech">هدف تكنولوجي</p>
+            <div class="ddc-bin" id="s5-b-tech" role="button" tabindex="0" data-count="0"><div class="ddc-bin__cards"></div></div>
+          </div>
+        </div>
+        <div class="scq-img srt-img">
+          <div class="scq-img-inner" data-zoom-wrapper>
+            <img src="assets/img/s5-scientist-developer.png" width="383" height="255" alt="باحثة ترتدي معطف المختبر تكتب بجانب مجهر، وبجانبها مطوّرة تعمل أمام حاسوب يعرض مخططًا تقنيًا.">
+          </div>
+        </div>
+      </div>
+      <div class="srt-bank" data-reveal="3" data-reveal-fade>
+        <div class="ddc-slot"><button class="ddqp-chip ddc-chip" id="s5-d-compress" type="button" aria-pressed="false">إلى أيّ مدى ينضغط الهواء مقارنةً بالماء تحت الضغط نفسه؟</button></div>
+        <div class="ddc-slot"><button class="ddqp-chip ddc-chip" id="s5-d-airbag" type="button" aria-pressed="false">كيف نصمّم وسادة هوائية تنفتح بسرعة وبأمان؟</button></div>
+        <div class="ddc-slot"><button class="ddqp-chip ddc-chip" id="s5-d-fill" type="button" aria-pressed="false">لماذا يملأ الغاز كامل حجم الوعاء بينما لا يفعل السائل ذلك؟</button></div>
+        <div class="ddc-slot"><button class="ddqp-chip ddc-chip" id="s5-d-tank" type="button" aria-pressed="false">كيف نبني أسطوانة غوص أخفّ وزنًا تتّسع للكمية نفسها من الهواء؟</button></div>
+      </div>
+      <p class="vh" id="s5-live" aria-live="polite"></p>
+    </div>
+    <button class="btn-continue" id="s5-check" type="button" disabled onclick="s5Primary()"><span class="nav-label"><span>هل إجابتي صحيحة؟</span></span></button>
+    <button class="scq-hint" id="s5-hint" type="button" onclick="s5OpenHint()">
+      <svg class="scq-hint-ico" viewBox="0 0 26 22.2883" fill="none" aria-hidden="true"><use href="#ico-bulb"/></svg>
+      <span class="nav-label"><span>هل يمكنني الحصول على تلميح؟</span></span>
+    </button>
+    <button class="btn-back" type="button" onclick="goBack()"><span class="nav-label"><span>رجوع</span></span></button>
+  </section>
+
+  <!-- ============ S6 (screen 6) — SingleChoiceQuestionImage — slide 45 (advanced 5/5) ============
+       Presenter note: "SingleChoiceQuestion", "רמת חשיבה: סינתזה", "שאלה 5 מתוך 5", "תמונה: תמונה9",
+       "רמז אחרי טעות ראשונה", Alt Text of תמונה 33. Options in the slide's visual order (the fourth
+       box, "תיבת טקסט 22", is last in the XML and last on screen); correct = option 2 (the check).
+       Picture = production file "תמונה9.png"; zoom. -->
+  <section class="screen" data-screen="6" id="s6">
+    <nav class="progress-question" aria-label="التنقُّل بين الأسئلة">
+      <div class="progress-question__item" data-question="1"><div class="progress-question__icon"></div><span class="progress-question__label">سؤال 1</span></div>
+      <div class="progress-question__connector" data-connector="1"><div class="progress-question__connector-line"></div></div>
+      <div class="progress-question__item" data-question="2"><div class="progress-question__icon"></div><span class="progress-question__label">سؤال 2</span></div>
+      <div class="progress-question__connector" data-connector="2"><div class="progress-question__connector-line"></div></div>
+      <div class="progress-question__item" data-question="3"><div class="progress-question__icon"></div><span class="progress-question__label">سؤال 3</span></div>
+      <div class="progress-question__connector" data-connector="3"><div class="progress-question__connector-line"></div></div>
+      <div class="progress-question__item" data-question="4"><div class="progress-question__icon"></div><span class="progress-question__label">سؤال 4</span></div>
+      <div class="progress-question__connector" data-connector="4"><div class="progress-question__connector-line"></div></div>
+      <div class="progress-question__item" data-question="5"><div class="progress-question__icon"></div><span class="progress-question__label">سؤال 5</span></div>
+    </nav>
+    <div class="scq-question">
+      <div class="scq-main" data-reveal="1">
+        <div class="scq-qtext">
+          <div class="scq-qbody">
+            <p>نفخ إياد كرة السلة التي يملكها ولاحظ أنه كلما أضاف هواءً، أصبح الضغط عليها أصعب.</p>
+            <p>قرّر أن يبحث في العلاقة بين كمية الهواء في الكرة ومدى صعوبة الضغط عليها.</p>
+            <p class="scq-qstem scq-qstem--accent" id="s6-stem">أيّ سؤال بحث يناسب الفحص الذي يجريه إياد؟</p>
+          </div>
+        </div>
+        <div class="scq-answers" role="radiogroup" aria-labelledby="s6-stem">
+          <button class="scq-opt" type="button" role="radio" aria-checked="false" data-id="a" onclick="s6q.select('a')">
+            <span class="scq-radio" aria-hidden="true"></span><span class="scq-opt-text">كيف يؤثر حجم الكرة في كمية الهواء داخلها؟</span><span class="vh vh-verdict"></span>
+          </button>
+          <button class="scq-opt" type="button" role="radio" aria-checked="false" data-id="b" onclick="s6q.select('b')">
+            <span class="scq-radio" aria-hidden="true"></span><span class="scq-opt-text">كيف تؤثّر كمية الهواء في الكرة في مدى صعوبة الضغط عليها؟</span><span class="vh vh-verdict"></span>
+          </button>
+          <button class="scq-opt" type="button" role="radio" aria-checked="false" data-id="c" onclick="s6q.select('c')">
+            <span class="scq-radio" aria-hidden="true"></span><span class="scq-opt-text">كيف تؤثّر شدّة الضغط على الكرة في التغيّر الذي يطرأ على شكلها؟</span><span class="vh vh-verdict"></span>
+          </button>
+          <button class="scq-opt" type="button" role="radio" aria-checked="false" data-id="d" onclick="s6q.select('d')">
+            <span class="scq-radio" aria-hidden="true"></span><span class="scq-opt-text">كيف يؤثّر نوع الكرة في مدى صعوبة الضغط عليها؟</span><span class="vh vh-verdict"></span>
+          </button>
+        </div>
+      </div>
+      <div class="scq-img" data-reveal="2" data-reveal-fade>
+        <div class="scq-img-inner" data-zoom-wrapper>
+          <img src="assets/img/s6-basketball-pump.png" width="466" height="311" alt="فتى في ملعب كرة سلة ينفخ كرة سلة بمضخة يدوية.">
+        </div>
+      </div>
+    </div>
+    <button class="btn-continue" id="s6-check" type="button" disabled onclick="s6q.primary()"><span class="nav-label"><span>هل إجابتي صحيحة؟</span></span></button>
+    <button class="scq-hint" id="s6-hint" type="button" style="visibility:hidden" onclick="s6q.openHint()">
+      <svg class="scq-hint-ico" viewBox="0 0 26 22.2883" fill="none" aria-hidden="true"><use href="#ico-bulb"/></svg>
+      <span class="nav-label"><span>هل يمكنني الحصول على تلميح؟</span></span>
+    </button>
+    <button class="btn-back" type="button" onclick="goBack()"><span class="nav-label"><span>رجوع</span></span></button>
+  </section>
+
+  <!-- ============ S7 (screen 7) — TextWithCallout, media=image — slide 46 (enrichment) ============
+       Presenter note: "TextWithCallout (media=image)", "תמונה: פריט ידע מעשיר2", Alt Text of תמונה 14.
+       Title = "דחיסוּת הגז– גם בחיי היום יום" verbatim (niqqud and spacing as authored), centred per the
+       template (the slide aligns it right - as part 04 S1). Text: the slide's six paragraphs, two of them
+       empty -> one-line gaps (.twc-gap); bold runs as authored. Picture = production file
+       "פריט ידע מעשיר2.png" (= the embed, 427x427); zoom. Continue = the slide's "המשך".
+       Animated overlay (Noa 2026-10-25, local to S7 - the script shows a still image): .s7-anim sits
+       on the PNG in its 427 viewBox, hides the drawn particles and arrows with the bubble's interior
+       gradient, and redraws them in place: right = particles drift apart, green arrows push out;
+       left = the cluster vibrates and squeezes, blue arrows press in. Decorative (aria-hidden), the
+       img alt unchanged; reduced motion = the still frame, identical to the PNG. -->
+  <section class="screen" data-screen="7" id="s7">
+    <h1 class="twc-title" data-reveal="1">قابلية الغاز للانضغاط – في الحياة اليومية أيضًا</h1>
+    <div class="twc-row">
+      <div class="twc-text" data-reveal="2">
+        <p>تعلّمتم أنّ الغاز <strong>قابل للانضغاط</strong>.</p>
+        <p>لكن ماذا يحدث إذا <strong>تغيّر ضغط الهواء من حولنا</strong>؟</p>
+        <p class="twc-gap">عندما <strong>يزداد</strong> ضغط الهواء المحيط بالغاز – <strong>ينضغط</strong> الغاز.</p>
+        <p>عندما <strong>يقلّ</strong> ضغط الهواء المحيط بالغاز – <strong>يتمدّد</strong> الغاز.</p>
+        <p class="twc-gap">هيّا نرى كيف يظهر ذلك في موقفين من حياتنا اليومية.</p>
+      </div>
+      <div class="twc-media">
+        <div class="scq-img twc-img" data-reveal="2" data-reveal-fade>
+          <div class="scq-img-inner" data-zoom-wrapper>
+            <button class="img-zoom-btn" type="button" aria-label="تكبير الصورة" data-zoom-src="assets/img/s7-air-pressure.png" data-zoom-alt="رسم توضيحي داخل دائرة. العنوان: «يتغيّر ضغط الهواء – الغاز ينضغط أو يتمدّد». على اليمين: «ضغط منخفض – الغاز يتمدّد»، جسيمات متباعدة وأسهم تتجه نحو الخارج. على اليسار: «ضغط مرتفع – الغاز ينضغط»، جسيمات متقاربة وأسهم تتجه نحو الداخل.">
+              <svg class="img-zoom-btn__icon" aria-hidden="true" width="20" height="20" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8 1C11.8661 1 15 4.13371 15 7.99902C15 11.8643 11.8661 14.998 8 14.998C4.1339 14.998 1.00002 11.8643 1 7.99902C1 4.13371 4.13389 1 8 1Z" stroke="currentColor" stroke-width="2"/><path d="M12.6221 14.188L14.2657 12.6141L19.928 18.5274C20.3626 18.9813 20.347 19.7016 19.8931 20.1362C19.4392 20.5708 18.7189 20.5552 18.2843 20.1013L12.6221 14.188Z" fill="currentColor"/></svg>
+            </button>
+            <img src="assets/img/s7-air-pressure.png" width="427" height="427" alt="رسم توضيحي داخل دائرة. العنوان: «يتغيّر ضغط الهواء – الغاز ينضغط أو يتمدّد». على اليمين: «ضغط منخفض – الغاز يتمدّد»، جسيمات متباعدة وأسهم تتجه نحو الخارج. على اليسار: «ضغط مرتفع – الغاز ينضغط»، جسيمات متقاربة وأسهم تتجه نحو الداخل.">
+            <svg class="s7-anim" viewBox="0 0 427 427" aria-hidden="true" focusable="false">
+              <defs>
+                <radialGradient id="s7-bg" gradientUnits="userSpaceOnUse" cx="213" cy="213" r="175">
+                  <stop offset="0" stop-color="#f8fafd"/><stop offset=".34" stop-color="#f7f9fd"/><stop offset=".51" stop-color="#f6f8fc"/>
+                  <stop offset=".69" stop-color="#f3f6fb"/><stop offset=".86" stop-color="#eef3fa"/><stop offset="1" stop-color="#edf3fa"/>
+                </radialGradient>
+                <radialGradient id="s7-ball" cx=".4" cy=".3" r=".75">
+                  <stop offset="0" stop-color="#cfe4f8"/><stop offset=".2" stop-color="#9fc6ef"/><stop offset=".52" stop-color="#5596d4"/>
+                  <stop offset=".86" stop-color="#2a69a9"/><stop offset="1" stop-color="#3271ae"/>
+                </radialGradient>
+                <linearGradient id="s7-tail-g"><stop offset="0" stop-color="#39935e" stop-opacity="0"/><stop offset="1" stop-color="#39935e"/></linearGradient>
+                <linearGradient id="s7-tail-b"><stop offset="0" stop-color="#1774c7" stop-opacity="0"/><stop offset="1" stop-color="#1774c7"/></linearGradient>
+                <filter id="s7-soft" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="1.5"/></filter>
+                <g id="s7-p9"><circle r="8.8" fill="url(#s7-ball)"/><ellipse cx="-2.4" cy="-4.4" rx="3.4" ry="1.9" fill="#fff" opacity=".5"/></g>
+                <g id="s7-p12"><circle r="11.8" fill="url(#s7-ball)"/><ellipse cx="-3.2" cy="-5.9" rx="4.5" ry="2.5" fill="#fff" opacity=".5"/></g>
+              </defs>
+              <!-- Covers: hide the PNG's own particles and arrows with the bubble's interior gradient. -->
+              <g class="s7-cover" fill="url(#s7-bg)" stroke="url(#s7-bg)" filter="url(#s7-soft)">
+                <ellipse cx="124" cy="255" rx="59" ry="54"/>
+                <circle cx="295.5" cy="198.5" r="13"/>
+                <circle cx="348" cy="218" r="13"/>
+                <circle cx="235.5" cy="230" r="13"/>
+                <circle cx="270.5" cy="230" r="13"/>
+                <circle cx="312.5" cy="235.5" r="13"/>
+                <circle cx="286" cy="261" r="13"/>
+                <circle cx="250.5" cy="276" r="13"/>
+                <circle cx="317" cy="277" r="13"/>
+                <circle cx="296" cy="301" r="13"/>
+                <line x1="269.42" y1="217.22" x2="230.98" y2="177.11" stroke-width="19" stroke-linecap="round"/>
+                <line x1="330.32" y1="201.98" x2="356.02" y2="164.71" stroke-width="19" stroke-linecap="round"/>
+                <line x1="328.88" y1="245.89" x2="376.45" y2="253.64" stroke-width="19" stroke-linecap="round"/>
+                <line x1="275.15" y1="284.82" x2="241.19" y2="325.57" stroke-width="19" stroke-linecap="round"/>
+                <line x1="74.82" y1="166.44" x2="100.82" y2="209.42" stroke-width="19" stroke-linecap="round"/>
+                <line x1="184.85" y1="176.14" x2="157.58" y2="211.93" stroke-width="19" stroke-linecap="round"/>
+                <line x1="80" y1="310" x2="99.86" y2="282.77" stroke-width="19" stroke-linecap="round"/>
+                <line x1="178.58" y1="324.81" x2="153.61" y2="291.29" stroke-width="19" stroke-linecap="round"/>
+              </g>
+              <!-- Small pressure (right): particles drift apart, green arrows push outward. -->
+              <g class="s7-spread">
+                <g transform="translate(295.5 198.5)"><g class="s7-drift s7-drift--1" style="animation-delay:-0s"><use href="#s7-p9"/></g></g>
+                <g transform="translate(348 218)"><g class="s7-drift s7-drift--2" style="animation-delay:-0.7s"><use href="#s7-p9"/></g></g>
+                <g transform="translate(235.5 230)"><g class="s7-drift s7-drift--3" style="animation-delay:-1.4s"><use href="#s7-p9"/></g></g>
+                <g transform="translate(270.5 230)"><g class="s7-drift s7-drift--1" style="animation-delay:-2.1s"><use href="#s7-p9"/></g></g>
+                <g transform="translate(312.5 235.5)"><g class="s7-drift s7-drift--2" style="animation-delay:-2.8s"><use href="#s7-p9"/></g></g>
+                <g transform="translate(286 261)"><g class="s7-drift s7-drift--3" style="animation-delay:-3.5s"><use href="#s7-p9"/></g></g>
+                <g transform="translate(250.5 276)"><g class="s7-drift s7-drift--1" style="animation-delay:-4.2s"><use href="#s7-p9"/></g></g>
+                <g transform="translate(317 277)"><g class="s7-drift s7-drift--2" style="animation-delay:-4.9s"><use href="#s7-p9"/></g></g>
+                <g transform="translate(296 301)"><g class="s7-drift s7-drift--3" style="animation-delay:-5.6s"><use href="#s7-p9"/></g></g>
+              </g>
+              <g class="s7-arrows-out">
+                <g transform="translate(233.75 180) rotate(-133.78)"><g class="s7-arr s7-arr--out"><rect x="-41.55" y="-2.3" width="32.55" height="4.6" fill="url(#s7-tail-g)"/><path d="M0 0L-13.5-7.5-9.5 0-13.5 7.5Z" fill="#39935e"/></g></g>
+                <g transform="translate(353.75 168) rotate(-55.42)"><g class="s7-arr s7-arr--out"><rect x="-31.27" y="-2.3" width="22.27" height="4.6" fill="url(#s7-tail-g)"/><path d="M0 0L-13.5-7.5-9.5 0-13.5 7.5Z" fill="#39935e"/></g></g>
+                <g transform="translate(372.5 253) rotate(9.26)"><g class="s7-arr s7-arr--out"><rect x="-34.2" y="-2.3" width="25.2" height="4.6" fill="url(#s7-tail-g)"/><path d="M0 0L-13.5-7.5-9.5 0-13.5 7.5Z" fill="#39935e"/></g></g>
+                <g transform="translate(243.75 322.5) rotate(129.81)"><g class="s7-arr s7-arr--out"><rect x="-39.05" y="-2.3" width="30.05" height="4.6" fill="url(#s7-tail-g)"/><path d="M0 0L-13.5-7.5-9.5 0-13.5 7.5Z" fill="#39935e"/></g></g>
+              </g>
+              <!-- Large pressure (left): the packed cluster vibrates and squeezes, blue arrows press inward. -->
+              <g class="s7-pack">
+                <g transform="translate(122.5 220)"><g class="s7-jit s7-jit--1" style="animation-delay:-0s"><use href="#s7-p12"/></g></g>
+                <g transform="translate(148.75 223.75)"><g class="s7-jit s7-jit--2" style="animation-delay:-0.13s"><use href="#s7-p12"/></g></g>
+                <g transform="translate(95 227.5)"><g class="s7-jit s7-jit--1" style="animation-delay:-0.26s"><use href="#s7-p12"/></g></g>
+                <g transform="translate(133.75 241)"><g class="s7-jit s7-jit--2" style="animation-delay:-0.39s"><use href="#s7-p12"/></g></g>
+                <g transform="translate(108.75 242.5)"><g class="s7-jit s7-jit--1" style="animation-delay:-0.52s"><use href="#s7-p12"/></g></g>
+                <g transform="translate(161 246)"><g class="s7-jit s7-jit--2" style="animation-delay:-0.65s"><use href="#s7-p12"/></g></g>
+                <g transform="translate(86 247.5)"><g class="s7-jit s7-jit--1" style="animation-delay:-0.78s"><use href="#s7-p12"/></g></g>
+                <g transform="translate(122.5 263.75)"><g class="s7-jit s7-jit--2" style="animation-delay:-0.91s"><use href="#s7-p12"/></g></g>
+                <g transform="translate(146 263.75)"><g class="s7-jit s7-jit--1" style="animation-delay:-1.04s"><use href="#s7-p12"/></g></g>
+                <g transform="translate(100 266)"><g class="s7-jit s7-jit--2" style="animation-delay:-1.17s"><use href="#s7-p12"/></g></g>
+                <g transform="translate(161 273.75)"><g class="s7-jit s7-jit--1" style="animation-delay:-1.3s"><use href="#s7-p12"/></g></g>
+                <g transform="translate(136 282.5)"><g class="s7-jit s7-jit--2" style="animation-delay:-1.43s"><use href="#s7-p12"/></g></g>
+                <g transform="translate(113.75 287.5)"><g class="s7-jit s7-jit--1" style="animation-delay:-1.56s"><use href="#s7-p12"/></g></g>
+              </g>
+              <g class="s7-arrows-in">
+                <g transform="translate(98.75 206) rotate(58.83)"><g class="s7-arr s7-arr--in"><rect x="-36.23" y="-2.3" width="27.23" height="4.6" fill="url(#s7-tail-b)"/><path d="M0 0L-13.5-7.5-9.5 0-13.5 7.5Z" fill="#1774c7"/></g></g>
+                <g transform="translate(160 208.75) rotate(127.3)"><g class="s7-arr s7-arr--in"><rect x="-33" y="-2.3" width="24" height="4.6" fill="url(#s7-tail-b)"/><path d="M0 0L-13.5-7.5-9.5 0-13.5 7.5Z" fill="#1774c7"/></g></g>
+                <g transform="translate(97.5 286) rotate(-53.9)"><g class="s7-arr s7-arr--in"><rect x="-29.7" y="-2.3" width="20.7" height="4.6" fill="url(#s7-tail-b)"/><path d="M0 0L-13.5-7.5-9.5 0-13.5 7.5Z" fill="#1774c7"/></g></g>
+                <g transform="translate(156 294.5) rotate(-126.69)"><g class="s7-arr s7-arr--in"><rect x="-31.8" y="-2.3" width="22.8" height="4.6" fill="url(#s7-tail-b)"/><path d="M0 0L-13.5-7.5-9.5 0-13.5 7.5Z" fill="#1774c7"/></g></g>
+              </g>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+    <button class="btn-continue" type="button" onclick="advanceScreen()"><span class="nav-label"><span>متابعة</span></span></button>
+    <button class="btn-back" type="button" onclick="goBack()"><span class="nav-label"><span>رجوع</span></span></button>
+  </section>
+
+  <!-- ============ S8 (screen 8) — TextWithCallout, media=video — slide 47 (enrichment) ============
+       Presenter note: "TextWithCallout (media=image)", "תמונה: פריט ידע מעשיר3". The slide's media is a
+       VIDEO (ppt/media/media1.mp4 = production file "סרטון 1.mp4", byte-identical), poster = the slide's
+       own poster frame (image43.png). The note names "פריט ידע מעשיר3" (a still in the folder) - the
+       slide shows the video, which wins (C5-10). Role B illustrative clip, Play-only on click (the
+       slide's mediacall). No title on the slide. Noa 2026-11-04: remove the heading's airplane
+       emoji and add the viewing instruction; preserve the authored underlined runs.
+       Alt = the media's descr (aria-label of the clip). -->
+  <section class="screen" data-screen="8" id="s8">
+    <div class="twc-row">
+      <div class="twc-text" data-reveal="1">
+        <p><strong>في كيس وجبات خفيفة</strong></p>
+        <p>أثناء الطيران، <u>يكون ضغط الهواء أقل</u>.</p>
+        <p>لذلك يتمدّد الهواء الموجود داخل كيس الوجبات الخفيفة،</p>
+        <p><u>وينتفخ الكيس.</u></p>
+        <p class="s8-video-instruction">شاهدوا الفيديو للتوضيح.</p>
+      </div>
+      <div class="twc-media" data-reveal="2" data-reveal-fade>
+        <div class="twc-video" id="s8-clip">
+          <video id="s8-video" src="assets/video/s8-snack-bag.mp4" poster="assets/img/s8-snack-bag-poster.jpg" preload="none" playsinline disablepictureinpicture controlslist="nodownload noplaybackrate" aria-label="كيس وجبات خفيفة على صينية في الطائرة، بجانب النافذة. مؤشر في الزاوية، «ضغط الهواء في مقصورة الركاب»، ينخفض من «عادي» إلى «منخفض»، والكيس ينتفخ تدريجيًا. تُظهر دائرة التكبير جسيمات الهواء داخل الكيس وهي تتباعد عن بعضها، مع أسهم متجهة نحو الخارج."></video>
+          <button class="twc-video__play" type="button" aria-label="تشغيل الفيديو" onclick="playClip('s8')"><img src="assets/img/video-play.svg" width="80" height="80" alt="" aria-hidden="true"></button>
+        </div>
+      </div>
+    </div>
+    <button class="btn-continue" type="button" onclick="advanceScreen()"><span class="nav-label"><span>متابعة</span></span></button>
+    <button class="btn-back" type="button" onclick="goBack()"><span class="nav-label"><span>رجوع</span></span></button>
+  </section>
+
+  <!-- ============ S9 (screen 9) — TextWithCallout, media=video — slide 48 (enrichment, LAST) ============
+       Presenter note: "TextWithCallout (media=image)", "סרטון2", "הפסקאות עולות אחת אחרי השנייה". Video =
+       ppt/media/media2.mp4 = production file "סרטון2.mp4" (byte-identical); poster = the slide's image44.
+       Paragraphs reveal one after another on entry (one reveal group each, C5-09 / Q-21). The summary box
+       (rounded outline, centred text) as on the slide; "הדוגמהות" verbatim (spelling section D).
+       Continue = the slide's "המשך" -> part 06 (שאלת שיא מועד א'), unconditionally. -->
+  <section class="screen" data-screen="9" id="s9">
+    <div class="twc-row">
+      <div class="twc-text">
+        <p data-reveal="2"><strong>زجاجة ماء</strong></p>
+        <p data-reveal="3">عند الهبوط، حين تنخفض الطائرة، <u>يزداد ضغط الهواء المحيط بنا</u>.</p>
+        <p data-reveal="4">الضغط الخارجي يضغط الهواء المحبوس في الزجاجة، ولذلك تنكمش الزجاجة.</p>
+        <p data-reveal="5">ظاهرة مشابهة تحدث أيضًا في آذاننا، ولهذا نشعر أحيانًا أنها «تنسدّ».</p>
+        <p class="s9-video-instruction" data-reveal="5">شاهدوا الفيديو للتوضيح.</p>
+      </div>
+      <div class="twc-media" data-reveal="1" data-reveal-fade>
+        <div class="twc-video" id="s9-clip">
+          <video id="s9-video" src="assets/video/s9-ear-landing.mp4" poster="assets/img/s9-ear-landing-poster.jpg" preload="none" playsinline disablepictureinpicture controlslist="nodownload noplaybackrate" aria-label="فتاة في الطائرة تمسك زجاجة ماء بلاستيكية. مؤشر بجانب النافذة: «ضغط الهواء في مقصورة الركاب»، مع عمود وسهم يشير إلى الأعلى."></video>
+          <button class="twc-video__play" type="button" aria-label="تشغيل الفيديو" onclick="playClip('s9')"><img src="assets/img/video-play.svg" width="80" height="80" alt="" aria-hidden="true"></button>
+        </div>
+      </div>
+    </div>
+    <div class="twc-summary" data-reveal="6">
+      <p>في جميع هذه الأمثلة تعمل الخاصية نفسها التي تعلمتموها:</p>
+      <p><strong>عندما يتغيّر الضغط على الغاز، قد يتغيّر حجمه أيضًا.</strong></p>
+    </div>
+    <button class="btn-continue" type="button" onclick="advanceScreen()"><span class="nav-label"><span>متابعة</span></span></button>
+    <button class="btn-back" type="button" onclick="goBack()"><span class="nav-label"><span>رجوع</span></span></button>
+  </section>
+
+
+<!-- Problem-report modal (approved-units pattern; posts to the shared Google Form) -->
+  <div id="report-modal" class="report-modal-overlay" hidden role="dialog" aria-modal="true" aria-labelledby="report-modal-title">
+    <div class="report-modal-box">
+      <button class="report-close-btn" onclick="tryCloseReportModal()" aria-label="إغلاق">&#10005;</button>
+      <h2 class="report-modal-title" id="report-modal-title">التبليغ عن مشكلة</h2>
+      <p class="report-modal-body">هل هناك شيء غير واضح أو لا يعمل كما يجب؟ أخبرونا بما حدث لنتمكن من معالجة المشكلة.</p>
+      <div class="report-field">
+        <label class="report-label" for="report-type">ما هو نوع المشكلة *</label>
+        <select class="report-select" id="report-type">
+          <option value="" disabled selected>اختاروا نوع المشكلة</option>
+          <option value="technical">عطل تقني أو شيء ما لا يعمل</option>
+          <option value="unclear">هناك شيء لا أفهمه</option>
+          <option value="other">آخر</option>
+        </select>
+      </div>
+      <div class="report-field">
+        <label class="report-label" for="report-text">ماذا حدث؟ *</label>
+        <textarea class="report-textarea" id="report-text" maxlength="250" rows="4" placeholder="صفوا المشكلة‎..."></textarea>
+        <span class="report-char-count" id="report-char-count">0 / 250</span>
+      </div>
+      <p class="report-error" id="report-error" hidden>يرجى اختيار نوع المشكلة ووصف ما حدث.</p>
+      <div class="report-actions">
+        <button class="report-submit-btn" onclick="submitReport()">إرسال</button>
+        <button class="report-cancel-btn" onclick="tryCloseReportModal()">إلغاء</button>
+      </div>
+      <div class="report-thanks" id="report-thanks" hidden>
+        <p>شكرًا! تم إرسال التبليغ. سنعالج المشكلة في أقرب وقت.</p>
+        <button class="report-submit-btn" onclick="forceCloseReportModal()">إغلاق</button>
+      </div>
+    </div>
+  </div>
+  <div id="report-confirm-modal" class="report-modal-overlay" hidden role="dialog" aria-modal="true" aria-labelledby="confirm-modal-title">
+    <div class="report-modal-box report-confirm-box">
+      <h2 class="report-modal-title" id="confirm-modal-title">هل تريدون إغلاق النافذة فعلًا؟</h2>
+      <p class="report-modal-body">إذا ضغطتم على إغلاق لن يتم إرسال التبليغ</p>
+      <div class="report-actions">
+        <button class="report-cancel-btn" onclick="forceCloseReportModal()">إغلاق النافذة</button>
+        <button class="report-submit-btn" onclick="backToReportForm()">أريد التبليغ</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="js/motion.js"></script>
+<script src="js/main.js"></script>
+<script src="js/report-modal.js"></script>
+</body>
+</html>

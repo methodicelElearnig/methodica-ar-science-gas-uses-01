@@ -1,0 +1,27 @@
+# OS / editor
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+.vscode/
+.idea/
+
+# Claude Code local settings
+.claude/settings.local.json
+
+# OneDrive / Office temp files
+~$*
+*.tmp
+
+# Tooling
+node_modules/
+*.log
+
+# Source documents (script, job aid) are kept outside the repo
+_source/
+*.pptx
+*.docx
+
+# Local development only (dev navigation shell, Claude Code session files)
+nav_dev.html
+.claude/
